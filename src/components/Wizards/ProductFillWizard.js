@@ -810,12 +810,7 @@ const ProductFillWizard = ({
 											headerName: 'Sales Order',
 											description: 'Sales Order',
 											valueGetter: ({ row }) =>
-												`${row.Sales_Order.display_value}${
-													row?.Reference
-														? ` (${row.Reference.display_value})`
-														: ''
-												}`,
-											valueFormatter: ({ value }) => value.display_value,
+												`${row.Sales_Order.display_value}: ${row['Sales_Order.Description']}`,
 											flex: 4,
 										},
 										{
