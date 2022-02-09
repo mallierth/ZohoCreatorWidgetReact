@@ -106,12 +106,14 @@ export const columns = [
     field: "Quantity",
     type: "number",
     flex: 1,
+    valueGetter: ({ row }) => row.Type === 'Comment' ? '' : row.Quantity,
   },
   {
     field: "Cost",
     type: "number",
     flex: 1,
     valueFormatter: ({ value }) => currency(value),
+    valueGetter: ({ row }) => row.Type === 'Comment' ? '' : row.Cost,
   },
   {
     field: "Cost_Total",
@@ -119,6 +121,7 @@ export const columns = [
     type: "number",
     flex: 1,
     valueFormatter: ({ value }) => currency(value),
+    valueGetter: ({ row }) => row.Type === 'Comment' ? '' : row.Cost_Total,
   },
   {
     field: "Sell_Price_Each",
@@ -126,6 +129,7 @@ export const columns = [
     type: "number",
     flex: 1,
     valueFormatter: ({ value }) => currency(value),
+    valueGetter: ({ row }) => row.Type === 'Comment' ? '' : row.Sell_Price_Each,
   },
   {
     field: "Sell_Price_Total",
@@ -133,6 +137,7 @@ export const columns = [
     type: "number",
     flex: 1,
     valueFormatter: ({ value }) => currency(value),
+    valueGetter: ({ row }) => row.Type === 'Comment' ? '' : row.Sell_Price_Total,
   },
   {
     field: "Margin",
@@ -140,6 +145,7 @@ export const columns = [
     type: "number",
     flex: 1,
     valueFormatter: ({ value }) => percent(value),
+    valueGetter: ({ row }) => row.Type === 'Comment' ? '' : row.Margin,
   },
 ];
 
@@ -206,28 +212,24 @@ const getProductInfo = (row) => {
 
 const getProductInfoRendered = (row) => {
   let nameCode = row.Name === row.Code ? row.Name : `${row.Name} (${row.Code})`;
+
+  if (row.Type === "Comment") {
+    return (
+      <Typography variant="body2">{row.Description}</Typography>
+    );
+  }
+
   return (
     <Box sx={{ display: "grid" }}>
-      {row.Type === "Comment" ? (
-        <Typography
-          variant="caption"
-          sx={{ color: "secondary", fontStyle: "italic" }}
-        >
-          {row.Description}
-        </Typography>
-      ) : (
-        <Box>
-          <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-            {nameCode}
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{ color: "secondary", fontStyle: "italic" }}
-          >
-            {row.Description}
-          </Typography>
-        </Box>
-      )}
+      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+        {nameCode}
+      </Typography>
+      <Typography
+        variant="caption"
+        sx={{ color: "secondary", fontStyle: "italic" }}
+      >
+        {row.Description}
+      </Typography>
     </Box>
   );
 };
