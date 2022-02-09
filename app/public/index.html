@@ -1,0 +1,42 @@
+<!-- sourced from https://raw.githubusercontent.com/reactjs/reactjs.org/master/static/html/single-file-example.html -->
+<!DOCTYPE html>
+<html style='width: 100%; overflow: hidden;'>
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, shrink-to-fit=no"
+		/>
+		<title>Zoho React</title>
+
+		<!--! Google's Roboto Font -->
+		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+
+		<!--! Material UI Icons  -->
+		<!-- <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" /> -->
+
+		<!--! Font Awesome  -->
+		<!-- <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-iKbFRxucmOHIcpWdX9NTZ5WETOPm0Goy0WmfyNcl52qSYtc2Buk0NCe6jU1sWWNB" crossorigin="anonymous"> -->
+
+	</head>
+
+	<body style='width: 100%; overflow: hidden;'>
+		<noscript>You need to enable JavaScript to run this app.</noscript>
+
+		<!--! React entry point -->
+		<div id="root"></div>
+		<!-- <script>
+			console.log('Testing height: ', window.innerHeight, window.getWindowHeight());
+			document.getElementById("root_Forms").style.height = `${window.innerHeight}px`;
+		</script> -->
+
+		<!--! Zoho Requirement -->
+		<script src="https://js.zohostatic.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
+
+		<!--! Webpack Bundle -->
+		<script src="./main.js"></script>
+		<script src="./react.js"></script>
+		<script src="./xlsx.js"></script>
+		<script src="./vendors.js"></script>
+	</body>
+</html>

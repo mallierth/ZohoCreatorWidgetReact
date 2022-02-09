@@ -1,0 +1,20 @@
+{
+  "service": "CREATOR",
+  "cspDomains": {
+    "connect-src": [
+      "http://www.w3.org",
+      "https://unpkg.com",
+      "https://code.jquery.com",
+      "https://cdnjs.cloudflare.com",
+      "https://ka-p.fontawesome.com/",
+      "https://kit.fontawesome.com/",
+      "https://pro.fontawesome.com",
+      "https://html2canvas.hertzen.com",
+      "wss://*.zohopublic.com",
+      "https://*.zoho.com",
+      "https://*.zohopublic.com",
+      "https://us.dws3.docmosis.com"
+    ]
+ }
+}
+

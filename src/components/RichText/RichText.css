@@ -1,0 +1,15 @@
+.ProseMirror,
+.ProseMirror-focused {
+  outline: none;
+  min-height: 250px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+:focus-visible {
+  outline: none;
+}
+
+.my-custom-class {
+  background-color: aqua;
+}
