@@ -168,8 +168,9 @@ const TableActions = ({
 	showDuplicate, //default hidden
 	disableDuplicate,
 }) => {
+	//<Box sx={{ visibility: hidden ? 'hidden' : 'visible' }}>
 	return (
-		<Box sx={{ visibility: hidden ? 'hidden' : 'visible' }}>
+		<Box sx={{ display: hidden ? 'none' : 'block' }}>
 			{!mobileMode ? (
 				<Stack direction='row' spacing={2}>
 					{/* Views */}

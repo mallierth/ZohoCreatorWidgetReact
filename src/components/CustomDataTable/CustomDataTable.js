@@ -346,6 +346,8 @@ const CustomDataGrid = ({
 
 	//Search
 	SearchProps,
+	RowGroupControlProps,
+	RowShiftControlProps,
 	ActionProps,
 	WrapperProps,
 	DataGridProps,
@@ -846,56 +848,64 @@ const CustomDataGrid = ({
 
 	//#region //? Export
 	const onClickExport = () => {
-		const exportData = selections.length > 0 ? selections : rows;
-		const exportColumns = columns.filter(
-			(column) => (!column.disableExport && !column.hide) || column.enableExport
-		);
-		let merges = []; //{s:{c:COLUMN_INDEX, r:ROW_INDEX}, e:{c:COLUMN_INDEX, r:ROW_INDEX}}
+		try {
+			const exportData = selections.length > 0 ? selections : rows;
+			const exportColumns = columns.filter(
+				(column) =>
+					(!column.disableExport && !column.hide) || column.enableExport
+			);
+			let merges = []; //{s:{c:COLUMN_INDEX, r:ROW_INDEX}, e:{c:COLUMN_INDEX, r:ROW_INDEX}}
 
-		//? Filter out hierarchy children
-		const filteredExportData = exportData
-			.filter(
-				(row) =>
-					!row.hierarchy ||
-					(Array.isArray(row.hierarchy) && row.hierarchy.length === 1)
-			)
-			.map((row, index) => {
-				let exportRow = {};
+			//? Filter out hierarchy children
+			const filteredExportData = exportData
+				.filter(
+					(row) =>
+						!row.hierarchy ||
+						(Array.isArray(row.hierarchy) && row.hierarchy.length === 1)
+				)
+				.map((row, index) => {
+					let exportRow = {};
 
-				exportColumns.forEach((exportColumn) => {
-					if (
-						exportColumn.renderCell &&
-						!exportColumn.valueFormatter &&
-						!exportColumn.valueGetter
-					) {
-						throw new Error(
-							`Export error: The cell ${row.field} in the grid is set to be rendered and does not have a value formatter set! Talk to your system administrator, this is an oversight that is easily fixed!`
-						);
-					}
+					exportColumns.forEach((exportColumn) => {
+						if (
+							exportColumn.renderCell &&
+							!exportColumn.valueFormatter &&
+							!exportColumn.valueGetter
+						) {
+							throw new Error(
+								`Export error: The cell ${row.field} in the grid is set to be rendered and does not have a value formatter set! Talk to your system administrator, this is an oversight that is easily fixed!`
+							);
+						}
 
-					if (exportColumn.valueFormatter) {
-						exportRow[exportColumn.field.replaceAll('_', ' ')] =
-							exportColumn.valueFormatter({
-								value: row[exportColumn.field],
-								row,
-							});
-					} else if (exportColumn.valueGetter) {
-						exportRow[exportColumn.field.replaceAll('_', ' ')] =
-							exportColumn.valueGetter({ value: row[exportColumn.field], row });
-					} else {
-						exportRow[exportColumn.field.replaceAll('_', ' ')] =
-							row[exportColumn.field];
-					}
+						if (exportColumn.valueFormatter) {
+							exportRow[exportColumn.field.replaceAll('_', ' ')] =
+								exportColumn.valueFormatter({
+									value: row[exportColumn.field],
+									row,
+								});
+						} else if (exportColumn.valueGetter) {
+							exportRow[exportColumn.field.replaceAll('_', ' ')] =
+								exportColumn.valueGetter({
+									value: row[exportColumn.field],
+									row,
+								});
+						} else {
+							exportRow[exportColumn.field.replaceAll('_', ' ')] =
+								row[exportColumn.field];
+						}
+					});
+
+					return exportRow;
 				});
 
-				return exportRow;
-			});
-
-		exportToXlsx(
-			filteredExportData,
-			exportFilename,
-			merges.length > 0 ? merges : null
-		);
+			exportToXlsx(
+				filteredExportData,
+				exportFilename,
+				merges.length > 0 ? merges : null
+			);
+		} catch (error) {
+			throw new Error(JSON.stringify(error));
+		}
 	};
 	//#endregion
 
@@ -1028,6 +1038,31 @@ const CustomDataGrid = ({
 							onCheckIgnoreActiveFilters: (value) =>
 								setIgnoreActiveFilters(value),
 						}}
+
+						RowGroupControlProps={{
+							...RowGroupControlProps,
+							size: 'large',
+							color:
+							selectionModel.length > 0
+								? 'secondary.contrastText'
+								: 'secondary.main',
+							disabled: RowGroupControlProps.disabled || rowDataState?.status === 'fetching',
+							
+						}}
+
+						RowShiftControlProps={{
+							...RowShiftControlProps,
+							size: 'large',
+							color:
+								selectionModel.length > 0
+									? 'secondary.contrastText'
+									: 'secondary.main',
+							disabled: RowGroupControlProps.disabled || rowDataState?.status === 'fetching',
+
+						}}
+
+
+
 						ActionProps={{
 							...ActionProps,
 							size: 'large',
@@ -1667,6 +1702,40 @@ CustomDataGrid.propTypes = {
 		ignoreActiveFilters: PropTypes.bool,
 		onCheckIgnoreActiveFilters: PropTypes.func,
 	}), //Useful for the sx prop on
+
+	RowGroupControlProps: PropTypes.shape({
+		show: PropTypes.bool, //default hidden
+		disabled: PropTypes.bool, //global disable
+
+		onCompress: PropTypes.func,
+		hideCompress: PropTypes.bool,
+		disableCompress: PropTypes.bool,
+
+		onExpand: PropTypes.func,
+		hideExpand: PropTypes.bool,
+		disableExpand: PropTypes.bool,
+	}),
+	RowShiftControlProps: PropTypes.shape({
+		show: PropTypes.bool, //default hidden
+		disabled: PropTypes.bool, //global disable
+
+		onShiftTop: PropTypes.func,
+		hideShiftTop: PropTypes.bool,
+		disableShiftTop: PropTypes.bool,
+
+		onShiftUp: PropTypes.func,
+		hideShiftUp: PropTypes.bool,
+		disableShiftUp: PropTypes.bool,
+
+		onShiftDown: PropTypes.func,
+		hideShiftDown: PropTypes.bool,
+		disableShiftDown: PropTypes.bool,
+
+		onShiftBottom: PropTypes.func,
+		hideShiftBottom: PropTypes.bool,
+		disableShiftBottom: PropTypes.bool,
+	}),
+
 	ActionProps: PropTypes.shape({
 		hidden: PropTypes.bool,
 		size: PropTypes.oneOf(['small', 'medium', 'large']),
@@ -1720,6 +1789,8 @@ CustomDataGrid.defaultProps = {
 	BackgroundComponent: Paper,
 	loadDataOnAddNewRow: {},
 	SearchProps: {},
+	RowGroupControlProps: {},
+	RowShiftControlProps: {},
 	ActionProps: {},
 	WrapperProps: {},
 	DataGridProps: {},

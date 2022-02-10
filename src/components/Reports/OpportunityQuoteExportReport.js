@@ -89,10 +89,6 @@ export const columns = [
 	{
 		field: 'Manufacturer',
 		flex: 2,
-		valueFormatter: (params) => {
-			console.log('paramns', params, params.api.getRow(params.id));
-			return params.value;
-		},
 	},
 	{
 		field: 'Product',
@@ -110,18 +106,30 @@ export const columns = [
 		field: 'Quantity',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ api, id, value }) => {
-			const row = api.getRow(id);
-			return row.Type === 'Comment' ? '' : value;
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : value;
 		},
 	},
 	{
 		field: 'Cost',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ api, id, value }) => {
-			const row = api.getRow(id);
-			return row.Type === 'Comment' ? '' : currency(value);
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : currency(value);
 		},
 	},
 	{
@@ -129,9 +137,15 @@ export const columns = [
 		headerName: 'Cost Total',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ api, id, value }) => {
-			const row = api.getRow(id);
-			return row.Type === 'Comment' ? '' : currency(value);
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : currency(value);
 		},
 	},
 	{
@@ -139,9 +153,15 @@ export const columns = [
 		headerName: 'Sell Price Each',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ api, id, value }) => {
-			const row = api.getRow(id);
-			return row.Type === 'Comment' ? '' : currency(value);
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : currency(value);
 		},
 	},
 	{
@@ -149,9 +169,15 @@ export const columns = [
 		headerName: 'Sell Price Total',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ api, id, value }) => {
-			const row = api.getRow(id);
-			return row.Type === 'Comment' ? '' : currency(value);
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : currency(value);
 		},
 	},
 	{
@@ -159,9 +185,15 @@ export const columns = [
 		headerName: 'Margin (%)',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ api, id, value }) => {
-			const row = api.getRow(id);
-			return row.Type === 'Comment' ? '' : percent(value);
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : percent(value);
 		},
 	},
 ];

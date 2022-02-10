@@ -124,8 +124,10 @@ const ToolbarSearch = ({
 		setMobileSearchDialogOpen(false);
 	};
 
+	//<Box sx={{ visibility: hidden ? 'hidden' : 'visible' }}>
+
 	return (
-		<Box sx={{ visibility: hidden ? 'hidden' : 'visible' }}>
+		<Box sx={{ display: hidden ? 'none' : 'block' }}>
 			<ThemeProvider
 				theme={createTheme({
 					palette: {
