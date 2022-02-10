@@ -89,6 +89,10 @@ export const columns = [
   {
     field: "Manufacturer",
     flex: 2,
+    valueFormatter: (params) => {
+      console.log("paramns", params, params.api.getRow(params.id));
+      return params.value;
+    },
   },
   {
     field: "Product",
@@ -106,46 +110,51 @@ export const columns = [
     field: "Quantity",
     type: "number",
     flex: 1,
-    valueGetter: ({ row }) => row.Type === 'Comment' ? '' : row.Quantity,
+    valueFormatter: ({ api, id, value }) => {
+      const row = api.getRow(id);
+      return row.Type === "Comment" ? "" : value;
+    },
   },
   {
     field: "Cost",
     type: "number",
     flex: 1,
-    valueFormatter: ({ value }) => currency(value),
-    valueGetter: ({ row }) => row.Type === 'Comment' ? '' : row.Cost,
+    valueFormatter: ({ api, id, value }) => {
+      const row = api.getRow(id);
+      return row.Type === "Comment" ? "" : currency(value);
+    },
   },
   {
     field: "Cost_Total",
     headerName: "Cost Total",
     type: "number",
     flex: 1,
-    valueFormatter: ({ value }) => currency(value),
-    valueGetter: ({ row }) => row.Type === 'Comment' ? '' : row.Cost_Total,
+    valueGetter: ({ row }) =>
+      row.Type === "Comment" ? "" : currency(row.Cost_Total),
   },
   {
     field: "Sell_Price_Each",
     headerName: "Sell Price Each",
     type: "number",
     flex: 1,
-    valueFormatter: ({ value }) => currency(value),
-    valueGetter: ({ row }) => row.Type === 'Comment' ? '' : row.Sell_Price_Each,
+    valueGetter: ({ row }) =>
+      row.Type === "Comment" ? "" : currency(row.Sell_Price_Each),
   },
   {
     field: "Sell_Price_Total",
     headerName: "Sell Price Total",
     type: "number",
     flex: 1,
-    valueFormatter: ({ value }) => currency(value),
-    valueGetter: ({ row }) => row.Type === 'Comment' ? '' : row.Sell_Price_Total,
+    valueGetter: ({ row }) =>
+      row.Type === "Comment" ? "" : currency(row.Sell_Price_Total),
   },
   {
     field: "Margin",
     headerName: "Margin (%)",
     type: "number",
     flex: 1,
-    valueFormatter: ({ value }) => percent(value),
-    valueGetter: ({ row }) => row.Type === 'Comment' ? '' : row.Margin,
+    valueGetter: ({ row }) =>
+      row.Type === "Comment" ? "" : percent(row.Margin),
   },
 ];
 
@@ -214,9 +223,7 @@ const getProductInfoRendered = (row) => {
   let nameCode = row.Name === row.Code ? row.Name : `${row.Name} (${row.Code})`;
 
   if (row.Type === "Comment") {
-    return (
-      <Typography variant="body2">{row.Description}</Typography>
-    );
+    return <Typography variant="body2">{row.Description}</Typography>;
   }
 
   return (
