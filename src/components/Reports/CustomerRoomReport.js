@@ -64,11 +64,13 @@ const CustomerRoomReport = ({
 	forcedCriteria,
 	loadData,
 	showActions,
+	ignoreDefaultView,
 }) => {
 	return (
 		<CustomDataTable
 			formName='Customer_Room'
 			height={maxHeight - 16}
+			ignoreDefaultView={ignoreDefaultView}
 			forcedCriteria={forcedCriteria}
 			loadDataOnAddNewRow={loadData}
 			DataGridProps={{
@@ -87,6 +89,7 @@ const CustomerRoomReport = ({
 };
 
 CustomerRoomReport.propTypes = {
+	ignoreDefaultView: PropTypes.bool,
 	showActions: PropTypes.bool,
 	maxHeight: PropTypes.number,
 	forcedCriteria: PropTypes.string,

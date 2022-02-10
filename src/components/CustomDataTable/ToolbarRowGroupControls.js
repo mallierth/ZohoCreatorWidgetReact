@@ -60,7 +60,7 @@ TableActionButton.propTypes = {
 	tooltip: PropTypes.string,
 	Icon: PropTypes.object.isRequired,
 	disabled: PropTypes.bool,
-	onClick: PropTypes.func.isRequired,
+	onClick: PropTypes.func,
 	color: PropTypes.string.isRequired,
 	size: PropTypes.oneOf(['small', 'medium', 'large']),
 	enableContextMenu: PropTypes.bool,

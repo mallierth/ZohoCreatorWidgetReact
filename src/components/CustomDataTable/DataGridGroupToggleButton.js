@@ -106,7 +106,7 @@ DataGridGroupToggleButton.propTypes = {
 		groupingField: PropTypes.oneOfType([
 			PropTypes.oneOf([null]),
 			PropTypes.string,
-		]).isRequired,
+		]),
 		/**
 		 * The key used to group the children of this row.
 		 */
@@ -131,7 +131,7 @@ DataGridGroupToggleButton.propTypes = {
 			PropTypes.oneOf([null]),
 			PropTypes.number,
 			PropTypes.string,
-		]).isRequired,
+		]),
 	}).isRequired,
 };
 

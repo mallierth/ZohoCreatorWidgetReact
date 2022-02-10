@@ -9,6 +9,7 @@ import {
 	appBreadcrumbState,
 	forceRerenderState,
 	appMaxWidthState,
+	applicationTabsState,
 } from '../recoil/atoms';
 import {
 	currentUserThemeModeState,
@@ -19,10 +20,7 @@ import {
 	themeSecondaryColorState,
 	currentUserIdState,
 } from '../recoil/selectors';
-import {
-	getCurrentUser,
-	getDatabaseInformationSuspense,
-} from '../apis/ZohoCreator';
+import { getCurrentUser, updateRecord } from '../apis/ZohoCreator';
 import MuiNavbar from './MuiNavbar';
 import {
 	createTheme,
@@ -60,8 +58,10 @@ import ProjectReport from './Reports/ProjectReport';
 import PurchaseOrderReport from './Reports/PurchaseOrderReport';
 import PurchaseReceiveReport from './Reports/PurchaseReceiveReport';
 import QuoteReport from './Reports/QuoteReport';
+import QuoteLineItemReport from './Reports/QuoteLineItemReport';
 import RmaReport from './Reports/RmaReport';
 import SalesOrderReport from './Reports/SalesOrderReport';
+import SalesOrderLineItemReport from './Reports/SalesOrderLineItemReport';
 import SerialNumberReport from './Reports/SerialNumberReport';
 import ServiceContractReport from './Reports/ServiceContractReport';
 import ServiceOrderReport from './Reports/ServiceOrderReport';
@@ -82,6 +82,8 @@ const INTERVAL_DURATION = 1000 * 60 * 5; //1000ms * 60s/minute * n desired minut
 const App = () => {
 	const handleError = useErrorHandler();
 	const sideNavEnabled = useRecoilValue(sideNavEnabledState);
+	const [applicationTabs, setApplicationTabs] =
+		useRecoilState(applicationTabsState);
 	const navBarHeight = useRecoilValue(navBarHeightState);
 	const [widgetStatus, setWidgetStatus] = useState({
 		loading: true,
@@ -105,6 +107,8 @@ const App = () => {
 	const [widgetInitDurationState, setWidgetInitDurationState] = useState(false);
 	const [paramIdFormLoaded, setParamIdFormLoaded] = useState(false);
 
+	const lastUserAppState = useRef(null);
+
 	useEffect(() => {
 		//setPageType(rootDiv.replace('root', ''));
 
@@ -116,6 +120,22 @@ const App = () => {
 			}
 		})();
 	}, []);
+
+	useEffect(() => {
+		console.log('applicationTabs change', applicationTabs);
+
+		if (
+			applicationTabs &&
+			lastUserAppState.current &&
+			JSON.stringify(applicationTabs) !==
+				JSON.stringify(lastUserAppState.current)
+		) {
+			updateRecord('Employees', currentUserId, {
+				Application_Tab_State: JSON.stringify(applicationTabs),
+			});
+			lastUserAppState.current = applicationTabs;
+		}
+	}, [applicationTabs]);
 
 	// useEffect(() => {
 	// 	if (widgetStatus.status === 'finished') {
@@ -149,6 +169,14 @@ const App = () => {
 			);
 			if (response.employee) {
 				setCurrentUser(response.employee);
+				setApplicationTabs(
+					response.employee.Application_Tab_State
+						? JSON.parse(response.employee.Application_Tab_State)
+						: {}
+				);
+				lastUserAppState.current = JSON.parse(
+					response.employee.Application_Tab_State
+				);
 			}
 			setWidgetStatus((old) => ({
 				...old,
@@ -481,6 +509,16 @@ const App = () => {
 						<QuoteReport maxHeight={maxHeight} maxWidth={maxWidth} />
 					</React.Suspense>
 				);
+			case 'Quote_Line_Items':
+				if (params.ID) {
+					return <RenderForm id={params.ID} formName={'Quote_Line_Item'} />;
+				}
+				//Render a report
+				return (
+					<React.Suspense fallback={<Loader show />}>
+						<QuoteLineItemReport maxHeight={maxHeight} maxWidth={maxWidth} />
+					</React.Suspense>
+				);
 			case 'RMAs':
 				//Render a record
 				if (params.ID) {
@@ -501,6 +539,21 @@ const App = () => {
 				return (
 					<React.Suspense fallback={<Loader show />}>
 						<SalesOrderReport maxHeight={maxHeight} maxWidth={maxWidth} />
+					</React.Suspense>
+				);
+			case 'Sales_Order_Line_Items':
+				if (params.ID) {
+					return (
+						<RenderForm id={params.ID} formName={'Sales_Order_Line_Item'} />
+					);
+				}
+				//Render a report
+				return (
+					<React.Suspense fallback={<Loader show />}>
+						<SalesOrderLineItemReport
+							maxHeight={maxHeight}
+							maxWidth={maxWidth}
+						/>
 					</React.Suspense>
 				);
 			case 'Serial_Numbers':

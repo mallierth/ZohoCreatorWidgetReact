@@ -731,9 +731,12 @@ const _FormTemplateForm = ({
 								}>
 								<LookupField2
 									name='Accounts'
+									formName='Account'
+									reportName='Accounts_Report'
 									defaultSortByColumn='Name'
 									defaultValue={state.currentData.Accounts}
 									onChange={(e) => mountData('Accounts', e)}
+									multiSelect
 									required
 									helperText={
 										error.Accounts

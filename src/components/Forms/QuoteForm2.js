@@ -81,6 +81,10 @@ import FormDeleteDialog from '../Modals/FormDeleteDialog';
 import ConvertQuoteToSalesOrderDialog from '../Modals/ConvertQuoteToSalesOrderDialog';
 import RichTextField from '../RichText/RichTextField';
 import dayjs from 'dayjs';
+import QuoteLineItemReport from '../Reports/QuoteLineItemReport';
+import NoteReport from '../Reports/BillingEntityReport';
+import EmailReport from '../Reports/EmailReport';
+import AttachmentReport from '../Reports/AttachmentReport';
 
 //#region //TODO Mass update fields available
 const massUpdateCapableFieldKeys = [
@@ -110,8 +114,7 @@ const defaultLoadData = {
 //#endregion
 
 //#region //TODO Helper functions
-const typeServiceOrderNotesTemplate = 
-	`<div>VisionPoint’s Service Rates are $165/hour (Customers w/o active Maintenance Agreement) and $125/hour (Customers w/ active Maintenance Agreement) port to port with a 3-hour minimum. Invoice will reflect actual hours worked. Non-system sales or transactional sales are covered by a manufacturer’s warranty. VisionPoint will assist with the return or repair of any equipment failures at no change within the first 30 days of purchase.<br>**Any applicable Sales Tax and/or Freight charges will be assessed at the time of invoicing.</div>`;
+const typeServiceOrderNotesTemplate = `<div>VisionPoint’s Service Rates are $165/hour (Customers w/o active Maintenance Agreement) and $125/hour (Customers w/ active Maintenance Agreement) port to port with a 3-hour minimum. Invoice will reflect actual hours worked. Non-system sales or transactional sales are covered by a manufacturer’s warranty. VisionPoint will assist with the return or repair of any equipment failures at no change within the first 30 days of purchase.<br>**Any applicable Sales Tax and/or Freight charges will be assessed at the time of invoicing.</div>`;
 const typeServiceOrderTermsAndConditionsTemplate = `<div>All information contained in this document is the intellectual property of VisionPoint LLC. This document has been provided for review only. VisionPoint LLC is an Equal Opportunity Employer.</div>`;
 
 //#endregion
@@ -177,8 +180,11 @@ const QuoteForm = ({
 		state?.currentData?.Void_field === true ||
 		state?.currentData?.Void_field === 'true';
 
-	const [overrideHtmlCustomerNotes, setOverrideHtmlCustomerNotes] = useState(data.Customer_Notes);
-	const [overrideHtmlTermsConditions, setOverrideHtmlTermsConditions] = useState(data.Terms_Conditions);
+	const [overrideHtmlCustomerNotes, setOverrideHtmlCustomerNotes] = useState(
+		data.Customer_Notes
+	);
+	const [overrideHtmlTermsConditions, setOverrideHtmlTermsConditions] =
+		useState(data.Terms_Conditions);
 
 	//! Record title when accessed via direct URL
 	useEffect(() => {
@@ -214,16 +220,18 @@ const QuoteForm = ({
 			onChange(state.savedData);
 		}
 
-		if(state.currentData?.Type == "Service Order") {
+		if (state.currentData?.Type == 'Service Order') {
 			//? Examine Quote Notes & Terms & Conditions
-			if(!state.currentData?.Customer_Notes) {
+			if (!state.currentData?.Customer_Notes) {
 				//mountData('Customer_Notes', );
 				setOverrideHtmlCustomerNotes(typeServiceOrderNotesTemplate);
 			}
 
-			if(!state.currentData?.Terms_Conditions) {
+			if (!state.currentData?.Terms_Conditions) {
 				//mountData('Terms_Conditions', typeServiceOrderTermsAndConditionsTemplate);
-				setOverrideHtmlTermsConditions(typeServiceOrderTermsAndConditionsTemplate);
+				setOverrideHtmlTermsConditions(
+					typeServiceOrderTermsAndConditionsTemplate
+				);
 			}
 		}
 
@@ -881,7 +889,9 @@ const QuoteForm = ({
 							value={tabValue}
 							onTabChanged={(e, tabIndex) => setTabValue(tabIndex)}>
 							<Tab label='Line Items' value='Line Items' />
-							<Tab label='Summary' value='Summary' />
+							{currentUserIsAdmin ? (
+								<Tab label='*Line Items' value='*Line Items' />
+							) : null}
 							<Tab label='Notes' value='Notes' />
 							<Tab label='Emails' value='Emails' />
 							<Tab label='Attachments' value='Attachments' />
@@ -904,32 +914,38 @@ const QuoteForm = ({
 									lineItemDispatch={lineItemDispatch}
 									parentId={id}
 								/>
-							) : tabValue === 'Summary' ? (
-								'Summary'
+							) : tabValue === '*Line Items' ? (
+								<QuoteLineItemReport
+									variant='tab'
+									maxHeight={maxHeight}
+									forcedCriteria={`(Quote==${id} && Deleted=false)`}
+									loadData={{
+										Quote: {
+											ID: id,
+											display_value: state?.currentData?.Name,
+										},
+									}}
+								/>
 							) : tabValue === 'Notes' ? (
-								<CustomTable
-									formName='Note'
-									reportName='Notes'
-									defaultSortByColumn='Added_Time'
-									defaultCriteria={`Parent_ID=="${id}"`}
-									tabTable
-									parentId={id}
+								<NoteReport
+									variant='tab'
+									maxHeight={maxHeight}
+									forcedCriteria={`Parent_ID=="${id}"`}
+									loadData={{ Parent_ID: id }}
 								/>
 							) : tabValue === 'Emails' ? (
-								<CustomTable
-									formName='Email'
-									defaultSortByColumn='Added_Time'
-									defaultCriteria={`Parent_ID=="${id}"`}
-									tabTable
-									parentId={id}
+								<EmailReport
+									variant='tab'
+									maxHeight={maxHeight}
+									forcedCriteria={`Parent_ID=="${id}"`}
+									loadData={{ Parent_ID: id }}
 								/>
 							) : tabValue === 'Attachments' ? (
-								<CustomTable
-									formName='Attachment'
-									defaultSortByColumn='Added_Time'
-									defaultCriteria={`Parent_ID=="${id}"`}
-									tabTable
-									parentId={id}
+								<AttachmentReport
+									variant='tab'
+									maxHeight={maxHeight}
+									forcedCriteria={`Parent_ID=="${id}"`}
+									loadData={{ Parent_ID: id }}
 								/>
 							) : null}
 						</TabbedSectionContent>

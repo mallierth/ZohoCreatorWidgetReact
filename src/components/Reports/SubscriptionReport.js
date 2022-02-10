@@ -124,11 +124,13 @@ const SubscriptionReport = ({
 	variant,
 	forcedCriteria,
 	loadData,
+	ignoreDefaultView,
 }) => {
 	return (
 		<CustomDataTable
 			formName='Subscription'
 			height={maxHeight - 16}
+			ignoreDefaultView={ignoreDefaultView}
 			forcedCriteria={forcedCriteria} //! add
 			loadDataOnAddNewRow={loadData} //! add
 			DataGridProps={{
@@ -150,6 +152,7 @@ const SubscriptionReport = ({
 };
 
 SubscriptionReport.propTypes = {
+	ignoreDefaultView: PropTypes.bool,
 	maxHeight: PropTypes.number,
 	forcedCriteria: PropTypes.string,
 	loadData: PropTypes.object,

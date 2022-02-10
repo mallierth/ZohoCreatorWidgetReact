@@ -80,6 +80,14 @@ import EmailReport from '../Reports/EmailReport';
 import AttachmentReport from '../Reports/AttachmentReport';
 import ContactReport from '../Reports/ContactReport';
 import ServiceOrderReport from '../Reports/ServiceOrderReport';
+import QuoteReport from '../Reports/QuoteReport';
+import OpportunityReport from '../Reports/OpportunityReport';
+import SalesOrderReport from '../Reports/SalesOrderReport';
+import ProjectReport from '../Reports/ProjectReport';
+import ServiceContractReport from '../Reports/ServiceContractReport';
+import SubscriptionReport from '../Reports/SubscriptionReport';
+import CustomerAssetReport from '../Reports/CustomerAssetReport';
+import CustomerRoomReport from '../Reports/CustomerRoomReport';
 
 //#region //TODO Mass update fields available
 const massUpdateCapableFieldKeys = [
@@ -676,18 +684,21 @@ const AccountForm = ({
 											setRenderPopupData({
 												title: getDrawerTitle('Quote'),
 												children: (
-													<Paper
-														elevation={3}
-														sx={{ backgroundColor: 'background.default' }}>
-														<CustomTable
-															formName={'Quote'}
-															getNameFn={(row) => row.Name}
-															defaultCriteria={`(Account == ${id})`}
-															defaultSortByColumn='Number'
-															defaultSortDirection='desc'
-															disableDefaultView
-														/>
-													</Paper>
+													<QuoteReport
+														maxHeight={maxHeight}
+														ignoreDefaultView
+														forcedCriteria={`(Account == ${id})`}
+														loadData={{
+															Account: {
+																ID: id,
+																display_value: state.currentData.Name,
+															},
+															Owner: {
+																ID: currentUser.ID,
+																display_value: currentUser.Full_Name,
+															},
+														}}
+													/>
 												),
 												onClose: () => setRenderPopupData({}),
 											})
@@ -709,18 +720,27 @@ const AccountForm = ({
 											setRenderPopupData({
 												title: getDrawerTitle('Opportunity'),
 												children: (
-													<Paper
-														elevation={3}
-														sx={{ backgroundColor: 'background.default' }}>
-														<CustomTable
-															formName={'Opportunity'}
-															getNameFn={(row) => row.Name}
-															defaultCriteria={`(Account == ${id})`}
-															defaultSortByColumn='Number'
-															defaultSortDirection='desc'
-															disableDefaultView
-														/>
-													</Paper>
+													<OpportunityReport
+														maxHeight={maxHeight}
+														ignoreDefaultView
+														forcedCriteria={`(Account == ${id} || Accounts.contains(${id}))`}
+														loadData={{
+															Account: {
+																ID: id,
+																display_value: state.currentData.Name,
+															},
+															Accounts: [
+																{
+																	ID: id,
+																	display_value: state.currentData.Name,
+																},
+															],
+															Owner: {
+																ID: currentUser.ID,
+																display_value: currentUser.Full_Name,
+															},
+														}}
+													/>
 												),
 												onClose: () => setRenderPopupData({}),
 											})
@@ -743,18 +763,21 @@ const AccountForm = ({
 											setRenderPopupData({
 												title: getDrawerTitle('Sales_Order'),
 												children: (
-													<Paper
-														elevation={3}
-														sx={{ backgroundColor: 'background.default' }}>
-														<CustomTable
-															formName={'Sales_Order'}
-															getNameFn={(row) => row.Name}
-															defaultCriteria={`(Account == ${id})`}
-															defaultSortByColumn='Number'
-															defaultSortDirection='desc'
-															disableDefaultView
-														/>
-													</Paper>
+													<SalesOrderReport
+														maxHeight={maxHeight}
+														ignoreDefaultView
+														forcedCriteria={`(Account == ${id})`}
+														loadData={{
+															Account: {
+																ID: id,
+																display_value: state.currentData.Name,
+															},
+															Owner: {
+																ID: currentUser.ID,
+																display_value: currentUser.Full_Name,
+															},
+														}}
+													/>
 												),
 												onClose: () => setRenderPopupData({}),
 											})
@@ -777,18 +800,23 @@ const AccountForm = ({
 											setRenderPopupData({
 												title: getDrawerTitle('Project'),
 												children: (
-													<Paper
-														elevation={3}
-														sx={{ backgroundColor: 'background.default' }}>
-														<CustomTable
-															formName={'Project'}
-															getNameFn={(row) => row.Name}
-															defaultCriteria={`(Account == ${id} || Accounts.contains(${id}))`}
-															defaultSortByColumn='Number'
-															defaultSortDirection='desc'
-															disableDefaultView
-														/>
-													</Paper>
+													<ProjectReport
+														maxHeight={maxHeight}
+														ignoreDefaultView
+														forcedCriteria={`(Account == ${id} || Accounts.contains(${id}))`}
+														loadData={{
+															Account: {
+																ID: id,
+																display_value: state.currentData.Name,
+															},
+															Accounts: [
+																{
+																	ID: id,
+																	display_value: state.currentData.Name,
+																},
+															],
+														}}
+													/>
 												),
 												onClose: () => setRenderPopupData({}),
 											})
@@ -820,20 +848,9 @@ const AccountForm = ({
 											setRenderPopupData({
 												title: getDrawerTitle('Service_Order'),
 												children: (
-													// <Paper
-													// 	elevation={3}
-													// 	sx={{ backgroundColor: 'background.default' }}>
-													// 	<CustomTable
-													// 		formName={'Service_Order'}
-													// 		getNameFn={(row) => row.Name}
-													// 		defaultCriteria={`(Account == ${id})`}
-													// 		defaultSortByColumn='Number'
-													// 		defaultSortDirection='desc'
-													// 		disableDefaultView
-													// 	/>
-													// </Paper>
 													<ServiceOrderReport
 														maxHeight={maxHeight}
+														ignoreDefaultView
 														forcedCriteria={`Account == ${id}`}
 														loadData={{
 															Account: {
@@ -864,18 +881,23 @@ const AccountForm = ({
 											setRenderPopupData({
 												title: getDrawerTitle('Service_Contract'),
 												children: (
-													<Paper
-														elevation={3}
-														sx={{ backgroundColor: 'background.default' }}>
-														<CustomTable
-															formName={'Service_Contract'}
-															getNameFn={(row) => row.Name}
-															defaultCriteria={`(Billing_Account == ${id} || Accounts.contains(${id}))`}
-															defaultSortByColumn='Number'
-															defaultSortDirection='desc'
-															disableDefaultView
-														/>
-													</Paper>
+													<ServiceContractReport
+														maxHeight={maxHeight}
+														ignoreDefaultView
+														forcedCriteria={`(Billing_Account == ${id} || Accounts.contains(${id}))`}
+														loadData={{
+															Billing_Account: {
+																ID: id,
+																display_value: state.currentData.Name,
+															},
+															Accounts: [
+																{
+																	ID: id,
+																	display_value: state.currentData.Name,
+																},
+															],
+														}}
+													/>
 												),
 												onClose: () => setRenderPopupData({}),
 											})
@@ -898,18 +920,19 @@ const AccountForm = ({
 											setRenderPopupData({
 												title: getDrawerTitle('Subscription'),
 												children: (
-													<Paper
-														elevation={3}
-														sx={{ backgroundColor: 'background.default' }}>
-														<CustomTable
-															formName={'Subscription'}
-															getNameFn={(row) => row.Name}
-															defaultCriteria={`(Account == ${id})`}
-															defaultSortByColumn='Number'
-															defaultSortDirection='desc'
-															disableDefaultView
-														/>
-													</Paper>
+													<SubscriptionReport
+														maxHeight={maxHeight}
+														ignoreDefaultView
+														forcedCriteria={`Accounts.contains(${id})`}
+														loadData={{
+															Accounts: [
+																{
+																	display_value: state.currentData.Name,
+																	ID: id,
+																},
+															],
+														}}
+													/>
 												),
 												onClose: () => setRenderPopupData({}),
 											})
@@ -932,18 +955,17 @@ const AccountForm = ({
 											setRenderPopupData({
 												title: getDrawerTitle('Customer_Asset'),
 												children: (
-													<Paper
-														elevation={3}
-														sx={{ backgroundColor: 'background.default' }}>
-														<CustomTable
-															formName={'Customer_Asset'}
-															getNameFn={(row) => row.Name}
-															defaultCriteria={`(Account == ${id})`}
-															defaultSortByColumn='Number'
-															defaultSortDirection='desc'
-															disableDefaultView
-														/>
-													</Paper>
+													<CustomerAssetReport
+														maxHeight={maxHeight}
+														ignoreDefaultView
+														forcedCriteria={`Account == ${id}`}
+														loadData={{
+															Account: {
+																display_value: state.currentData.Name,
+																ID: id,
+															},
+														}}
+													/>
 												),
 												onClose: () => setRenderPopupData({}),
 											})
@@ -967,18 +989,17 @@ const AccountForm = ({
 											setRenderPopupData({
 												title: getDrawerTitle('Customer_Room'),
 												children: (
-													<Paper
-														elevation={3}
-														sx={{ backgroundColor: 'background.default' }}>
-														<CustomTable
-															formName={'Customer_Room'}
-															getNameFn={(row) => row.Name}
-															defaultCriteria={`(Account == ${id})`}
-															defaultSortByColumn='Number'
-															defaultSortDirection='desc'
-															disableDefaultView
-														/>
-													</Paper>
+													<CustomerRoomReport
+														maxHeight={maxHeight}
+														ignoreDefaultView
+														forcedCriteria={`Account == ${id}`}
+														loadData={{
+															Account: {
+																display_value: state.currentData.Name,
+																ID: id,
+															},
+														}}
+													/>
 												),
 												onClose: () => setRenderPopupData({}),
 											})

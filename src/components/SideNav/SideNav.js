@@ -35,6 +35,7 @@ import {
 import {
 	autoHideNavigationState,
 	applicationTabLastUuidState,
+	currentUserIsAdminState,
 } from '../../recoil/selectors';
 import MuiNavbar from '../MuiNavbar';
 import DatabaseDefaultIcon from '../Helpers/DatabaseDefaultIcon';
@@ -85,6 +86,8 @@ const navWizards = [
 	//"Pick_Ticket",
 	//"RMA_Processing",
 ].sort();
+
+const navAdmin = ['Quote_Line_Item', 'Sales_Order_Line_Item'].sort();
 
 const miniDrawerWidth = (theme) => {
 	//theme?.spacing(n) returns a string with px
@@ -195,7 +198,7 @@ const SideNav = ({ renderPage }) => {
 	const appMaxWidth = useRecoilValue(appMaxWidthState);
 	const navBarHeight = useRecoilValue(navBarHeightState);
 	const tabBarHeight = useRecoilValue(tabBarHeightState);
-	const autoHideNavigation = useRecoilValue(autoHideNavigationState);
+	const currentUserIsAdmin = useRecoilValue(currentUserIsAdminState);
 	const [applicationTabs, setApplicationTabs] =
 		useRecoilState(applicationTabsState);
 	const applicationTabLastUuid = useRecoilValue(applicationTabLastUuidState);
@@ -212,7 +215,7 @@ const SideNav = ({ renderPage }) => {
 	const [navContextMenuReportName, setNavContextMenuReportName] = useState({});
 
 	//TreeView 1/19/22
-	const [expanded, setExpanded] = useState(['Search', 'Wizards',]);
+	const [expanded, setExpanded] = useState(['Search', 'Wizards']);
 	const [selected, setSelected] = useState('Dashboard');
 
 	const onAppTabChange = (e, newValue) => {
@@ -403,12 +406,19 @@ const SideNav = ({ renderPage }) => {
 					selected={selected}
 					onNodeToggle={(e, nodeIds) => setExpanded(nodeIds)}
 					onNodeSelect={(e, nodeId) => {
-						if (nodeId !== 'Search' && nodeId !== 'Wizards') {
+						if (
+							nodeId !== 'Search' &&
+							nodeId !== 'Wizards' &&
+							nodeId !== 'Admin'
+						) {
 							setSelected(nodeId);
 							const type =
 								nodeId === 'Dashboard'
 									? 'dashboard'
 									: navForms
+											.map((form) => plurifyFormName(form))
+											.includes(nodeId) ||
+									  navAdmin
 											.map((form) => plurifyFormName(form))
 											.includes(nodeId)
 									? 'report'
@@ -474,6 +484,22 @@ const SideNav = ({ renderPage }) => {
 							/>
 						))}
 					</StyledTreeItem>
+
+					{currentUserIsAdmin ? (
+						<StyledTreeItem nodeId='Admin' labelText='Admin' formName='Admin'>
+							{navAdmin.map((form) => (
+								<StyledTreeItem
+									key={form}
+									nodeId={plurifyFormName(form)}
+									labelText={plurifyFormName(form?.replaceAll('_', ' '))}
+									formName={form}
+									onContextMenu={(e) =>
+										onRightClickNavTab(e, plurifyFormName(form), 'report')
+									}
+								/>
+							))}
+						</StyledTreeItem>
+					) : null}
 				</TreeView>
 			</Drawer>
 

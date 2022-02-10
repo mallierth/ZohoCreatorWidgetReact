@@ -165,11 +165,12 @@ CustomFooter.propTypes = {
 	rows: PropTypes.array.isRequired,
 };
 
-const ProjectReport = ({ maxHeight, variant, forcedCriteria, loadData }) => {
+const ProjectReport = ({ maxHeight, variant, forcedCriteria, loadData, ignoreDefaultView, }) => {
 	return (
 		<CustomDataTable
 			formName='Project'
 			height={maxHeight - 16}
+			ignoreDefaultView={ignoreDefaultView}
 			forcedCriteria={forcedCriteria} //! add
 			loadDataOnAddNewRow={loadData} //! add
 			DataGridProps={{
@@ -198,6 +199,7 @@ const ProjectReport = ({ maxHeight, variant, forcedCriteria, loadData }) => {
 };
 
 ProjectReport.propTypes = {
+	ignoreDefaultView: PropTypes.bool,
 	maxHeight: PropTypes.number,
 	forcedCriteria: PropTypes.string,
 	loadData: PropTypes.object,

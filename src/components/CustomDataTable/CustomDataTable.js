@@ -72,20 +72,6 @@ const exportToXlsx = (jsonData, fileName, merges) => {
 };
 //#endregion
 
-// const DuplicateQuoteDialog = (props) => {
-// 	return (
-// 		<DuplicateRecordDialog {...props}>{props.children}</DuplicateRecordDialog>
-// 	);
-// };
-
-// DuplicateQuoteDialog.propTypes = {
-// 	formName: PropTypes.string.isRequired,
-// 	open: PropTypes.bool,
-// 	onClose: PropTypes.func.isRequired,
-// 	onDuplicate: PropTypes.func.isRequired,
-// 	children: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-// };
-
 export const ToolbarTitle = ({ mode, formName, recordName }) => {
 	const renderTitle = () => {
 		switch (mode) {
@@ -335,6 +321,7 @@ const CustomDataGrid = ({
 	hideFilters,
 	hideFilterGraphic,
 	overrideDefaultView, //Primarily for the dashboard to display specific views
+	ignoreDefaultView,
 	defaultSelections, //for LookupField
 	disableOpenOnRowClick,
 	disableRowRightClick,
@@ -672,7 +659,7 @@ const CustomDataGrid = ({
 	useEffect(() => {
 		if (
 			views.length > 0 &&
-			(overrideDefaultView || currentUser[`${formName}_Default_View`])
+			(overrideDefaultView || currentUser[`${formName}_Default_View`] && !ignoreDefaultView)
 		) {
 			//Views have been loaded from the database and the currentUser has a default view defined for this report
 			setActiveView(
@@ -1044,6 +1031,24 @@ const CustomDataGrid = ({
 							disabled:
 								RowGroupControlProps.disabled ||
 								rowDataState?.status === 'fetching',
+
+							disableCompress:
+								RowGroupControlProps.disableCompress ||
+								selections.length === 0 ||
+								!RowGroupControlProps?.canCompress(selections),
+							onCompress: () => {
+								//TODO
+								setRows(RowGroupControlProps?.onCompressFormatter(selections));
+							},
+
+							disableExpand:
+								RowGroupControlProps.disableExpand ||
+								selections.length === 0 ||
+								!RowGroupControlProps?.canExpand(selections),
+							onExpand: () => {
+								//TODO
+								setRows(RowGroupControlProps?.onExpandFormatter(selections));
+							},
 						}}
 						RowShiftControlProps={{
 							...RowShiftControlProps,
@@ -1053,8 +1058,31 @@ const CustomDataGrid = ({
 									? 'secondary.contrastText'
 									: 'secondary.main',
 							disabled:
-								RowGroupControlProps.disabled ||
+								RowShiftControlProps.disabled ||
 								rowDataState?.status === 'fetching',
+
+							disableShiftTop:
+								RowShiftControlProps.disableShiftTop || selections.length === 0,
+							onShiftTop: () => {
+								//TODO
+							},
+							disableShiftUp:
+								RowShiftControlProps.disableShiftUp || selections.length === 0,
+							onShiftUp: () => {
+								//TODO
+							},
+							disableShiftDown:
+								RowShiftControlProps.disableShiftDown ||
+								selections.length === 0,
+							onShiftDown: () => {
+								//TODO
+							},
+							disableShiftBottom:
+								RowShiftControlProps.disableShiftBottom ||
+								selections.length === 0,
+							onShiftBottom: () => {
+								//TODO
+							},
 						}}
 						ActionProps={{
 							...ActionProps,
@@ -1650,6 +1678,7 @@ CustomDataGrid.propTypes = {
 	hideSearch: PropTypes.bool,
 	hideFilters: PropTypes.bool,
 	hideFilterGraphic: PropTypes.bool,
+	ignoreDefaultView: PropTypes.bool,
 	overrideDefaultView: PropTypes.exact({
 		ID: PropTypes.string,
 		Name: PropTypes.string,
@@ -1704,13 +1733,15 @@ CustomDataGrid.propTypes = {
 		show: PropTypes.bool, //default hidden
 		disabled: PropTypes.bool, //global disable
 
-		onCompress: PropTypes.func,
 		hideCompress: PropTypes.bool,
 		disableCompress: PropTypes.bool,
+		canCompress: PropTypes.func, //Selections are fed to this function with a bool result
+		onCompressFormatter: PropTypes.func,
 
-		onExpand: PropTypes.func,
 		hideExpand: PropTypes.bool,
 		disableExpand: PropTypes.bool,
+		canExpand: PropTypes.func, //Selections are fed to this function with a bool result
+		onExpandFormatter: PropTypes.func,
 	}),
 	RowShiftControlProps: PropTypes.shape({
 		show: PropTypes.bool, //default hidden
@@ -1786,7 +1817,10 @@ CustomDataGrid.defaultProps = {
 	BackgroundComponent: Paper,
 	loadDataOnAddNewRow: {},
 	SearchProps: {},
-	RowGroupControlProps: {},
+	RowGroupControlProps: {
+		canCompress: () => {},
+		canExpand: () => {},
+	},
 	RowShiftControlProps: {},
 	ActionProps: {},
 	WrapperProps: {},

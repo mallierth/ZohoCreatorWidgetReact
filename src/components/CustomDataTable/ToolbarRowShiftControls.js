@@ -112,7 +112,7 @@ TableActionButton.propTypes = {
 	tooltip: PropTypes.string,
 	Icon: PropTypes.object.isRequired,
 	disabled: PropTypes.bool,
-	onClick: PropTypes.func.isRequired,
+	onClick: PropTypes.func,
 	color: PropTypes.string.isRequired,
 	size: PropTypes.oneOf(['small', 'medium', 'large']),
 	enableContextMenu: PropTypes.bool,
@@ -155,7 +155,7 @@ const TableActions = ({
 					{/* Top */}
 					{!hideShiftTop ? (
 						<TableActionButton
-							tooltip='Saved Views'
+							tooltip='Shift to Top'
 							disabled={disableShiftTop || disabled}
 							onClick={onShiftTop}
 							Icon={FirstPage}
@@ -167,7 +167,7 @@ const TableActions = ({
 					{/* Up */}
 					{!hideShiftUp ? (
 						<TableActionButton
-							tooltip='Customize Active Filters'
+							tooltip='Shift Up One Row'
 							disabled={disableShiftUp || disabled}
 							onClick={onShiftUp}
 							Icon={ChevronLeft}
@@ -179,7 +179,7 @@ const TableActions = ({
 					{/* Down */}
 					{!hideShiftDown ? (
 						<TableActionButton
-							tooltip='Edit'
+							tooltip='Shift Down One Row'
 							disabled={disableShiftDown || disabled}
 							onClick={onShiftDown}
 							Icon={ChevronRight}
@@ -191,7 +191,7 @@ const TableActions = ({
 					{/* Bottom */}
 					{!hideShiftBottom ? (
 						<TableActionButton
-							tooltip='Mass Update'
+							tooltip='Shift to Bottom'
 							disabled={disableShiftBottom || disabled}
 							onClick={onShiftBottom}
 							Icon={LastPage}
@@ -199,6 +199,11 @@ const TableActions = ({
 							size={size}
 						/>
 					) : null}
+
+					<Divider
+						orientation='vertical'
+						flexItem
+					/>
 				</Stack>
 			) : null}
 		</Box>

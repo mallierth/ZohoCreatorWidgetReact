@@ -7,6 +7,7 @@ import { omit } from 'lodash-es';
 import ThemeCard from '../ThemeCard';
 import TabbedSection from '../TabbedSection/TabbedSection';
 import { debugState, currentUserState } from '../../recoil/atoms';
+import { currentUserIsAdminState } from '../../recoil/selectors';
 import * as Columns from '../../recoil/columnAtoms';
 import DatabaseDefaultIcon from '../Helpers/DatabaseDefaultIcon';
 import LookupField2 from '../FormControls/LookupField2';
@@ -69,6 +70,10 @@ import WizardDialog from '../Wizards/WizardDialog';
 import WizardStep from '../Wizards/WizardStep';
 import ContextCircularProgressLoader from '../Loaders/ContextCircularProgressLoader';
 import RichTextField from '../RichText/RichTextField';
+import SalesOrderLineItemReport from '../Reports/SalesOrderLineItemReport';
+import NoteReport from '../Reports/BillingEntityReport';
+import EmailReport from '../Reports/EmailReport';
+import AttachmentReport from '../Reports/AttachmentReport';
 
 //#region //TODO Mass update fields available
 const massUpdateCapableFieldKeys = [
@@ -242,6 +247,7 @@ const SalesOrderForm = ({
 	maxHeight,
 }) => {
 	const currentUser = useRecoilValue(currentUserState);
+	const currentUserIsAdmin = useRecoilValue(currentUserIsAdminState);
 	const columns = useRecoilValue(
 		Columns[`${camelize(formName.replaceAll('_', ''))}ColumnsState`]
 	);
@@ -875,7 +881,9 @@ const SalesOrderForm = ({
 							value={tabValue}
 							onTabChanged={(e, tabIndex) => setTabValue(tabIndex)}>
 							<Tab label='Line Items' value='Line Items' />
-							<Tab label='Summary' value='Summary' />
+							{currentUserIsAdmin ? (
+								<Tab label='*Line Items' value='*Line Items' />
+							) : null}
 							<Tab label='Notes' value='Notes' />
 							<Tab label='Emails' value='Emails' />
 							<Tab label='Attachments' value='Attachments' />
@@ -898,32 +906,38 @@ const SalesOrderForm = ({
 									lineItemDispatch={lineItemDispatch}
 									parentId={id}
 								/>
-							) : tabValue === 'Summary' ? (
-								'Summary'
+							) : tabValue === '*Line Items' ? (
+								<SalesOrderLineItemReport
+									variant='tab'
+									maxHeight={maxHeight}
+									forcedCriteria={`(Quote==${id} && Deleted=false)`}
+									loadData={{
+										Quote: {
+											ID: id,
+											display_value: state?.currentData?.Name,
+										},
+									}}
+								/>
 							) : tabValue === 'Notes' ? (
-								<CustomTable
-									formName='Note'
-									reportName='Notes'
-									defaultSortByColumn='Added_Time'
-									defaultCriteria={`Parent_ID=="${id}"`}
-									tabTable
-									parentId={id}
+								<NoteReport
+									variant='tab'
+									maxHeight={maxHeight}
+									forcedCriteria={`Parent_ID=="${id}"`}
+									loadData={{ Parent_ID: id }}
 								/>
 							) : tabValue === 'Emails' ? (
-								<CustomTable
-									formName='Email'
-									defaultSortByColumn='Added_Time'
-									defaultCriteria={`Parent_ID=="${id}"`}
-									tabTable
-									parentId={id}
+								<EmailReport
+									variant='tab'
+									maxHeight={maxHeight}
+									forcedCriteria={`Parent_ID=="${id}"`}
+									loadData={{ Parent_ID: id }}
 								/>
 							) : tabValue === 'Attachments' ? (
-								<CustomTable
-									formName='Attachment'
-									defaultSortByColumn='Added_Time'
-									defaultCriteria={`Parent_ID=="${id}"`}
-									tabTable
-									parentId={id}
+								<AttachmentReport
+									variant='tab'
+									maxHeight={maxHeight}
+									forcedCriteria={`Parent_ID=="${id}"`}
+									loadData={{ Parent_ID: id }}
 								/>
 							) : null}
 						</TabbedSectionContent>

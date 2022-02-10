@@ -109,11 +109,13 @@ const CustomerAssetReport = ({
 	forcedCriteria,
 	loadData,
 	showActions,
+	ignoreDefaultView,
 }) => {
 	return (
 		<CustomDataTable
 			formName='Customer_Asset'
 			height={maxHeight - 16}
+			ignoreDefaultView={ignoreDefaultView}
 			forcedCriteria={forcedCriteria}
 			loadDataOnAddNewRow={loadData}
 			duplicateDialogComponent={(data, setData, open, onClose, onDuplicate) => (
@@ -173,6 +175,7 @@ const CustomerAssetReport = ({
 };
 
 CustomerAssetReport.propTypes = {
+	ignoreDefaultView: PropTypes.bool,
 	showActions: PropTypes.bool,
 	maxHeight: PropTypes.number,
 	forcedCriteria: PropTypes.string,

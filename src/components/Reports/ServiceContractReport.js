@@ -175,11 +175,13 @@ const ServiceContractReport = ({
 	variant,
 	forcedCriteria,
 	loadData,
+	ignoreDefaultView,
 }) => {
 	return (
 		<CustomDataTable
 			formName='Service_Contract'
 			height={maxHeight - 16}
+			ignoreDefaultView={ignoreDefaultView}
 			forcedCriteria={forcedCriteria} //! add
 			loadDataOnAddNewRow={loadData} //! add
 			DataGridProps={{
@@ -201,6 +203,7 @@ const ServiceContractReport = ({
 };
 
 ServiceContractReport.propTypes = {
+	ignoreDefaultView: PropTypes.bool,
 	maxHeight: PropTypes.number,
 	forcedCriteria: PropTypes.string,
 	loadData: PropTypes.object,

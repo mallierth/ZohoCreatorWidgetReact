@@ -149,11 +149,13 @@ const OpportunityReport = ({
 	variant,
 	forcedCriteria,
 	loadData,
+	ignoreDefaultView,
 }) => {
 	return (
 		<CustomDataTable
 			formName='Opportunity'
 			height={maxHeight - 16}
+			ignoreDefaultView={ignoreDefaultView}
 			forcedCriteria={forcedCriteria} //! add
 			loadDataOnAddNewRow={loadData} //! add
 			DataGridProps={{
@@ -172,6 +174,7 @@ const OpportunityReport = ({
 };
 
 OpportunityReport.propTypes = {
+	ignoreDefaultView: PropTypes.bool,
 	maxHeight: PropTypes.number,
 	forcedCriteria: PropTypes.string,
 	loadData: PropTypes.object,

@@ -19,12 +19,6 @@ import { sum, currency, intTryParse, percent } from '../Helpers/functions';
 
 //? Report Filter Columns
 export const columns = [
-	// {
-	// 	field: 'Sales_Order',
-	// 	headerName: 'Sales Order',
-	// 	flex: 1,
-	// 	valueGetter: ({ value }) => value.display_value || '',
-	// },
 	{
 		field: 'Type',
 		headerName: '',
@@ -98,71 +92,104 @@ export const columns = [
 		renderCell: ({ row }) => getProductInfoRendered(row),
 	},
 	{
+		field: 'Description',
+		flex: 5,
+		hide: true,
+		enableExport: true,
+	},
+	{
 		field: 'Quantity',
 		type: 'number',
 		flex: 1,
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : value;
+		},
 	},
 	{
 		field: 'Cost',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ value }) => currency(value),
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : currency(value);
+		},
 	},
-	// {
-	// 	field: 'Cost_Subtotal',
-	// 	headerName: 'Cost Subtotal',
-	// 	type: 'number',
-	// 	flex: 1,
-	// 	valueFormatter: ({ value }) => currency(value),
-	// },
 	{
 		field: 'Cost_Total',
 		headerName: 'Cost Total',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ value }) => currency(value),
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : currency(value);
+		},
 	},
 	{
 		field: 'Sell_Price_Each',
 		headerName: 'Sell Price Each',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ value }) => currency(value),
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : currency(value);
+		},
 	},
-	// {
-	// 	field: 'Sell_Price_Subtotal',
-	// 	headerName: 'Sell Price Subtotal',
-	// 	type: 'number',
-	// 	flex: 1,
-	// 	valueFormatter: ({ value }) => currency(value),
-	// },
 	{
 		field: 'Sell_Price_Total',
 		headerName: 'Sell Price Total',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ value }) => currency(value),
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : currency(value);
+		},
 	},
-	// {
-	// 	field: 'Discount_Rate',
-	// 	headerName: 'Discount (%)',
-	// 	type: 'number',
-	// 	flex: 1,
-	// 	valueFormatter: ({ value }) => percent(value),
-	// },
-	// {
-	// 	field: 'Discount_Dollars',
-	// 	headerName: 'Discount ($)',
-	// 	type: 'number',
-	// 	flex: 1,
-	// 	valueFormatter: ({ value }) => currency(value),
-	// },
 	{
 		field: 'Margin',
 		headerName: 'Margin (%)',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ value }) => percent(value),
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : percent(value);
+		},
 	},
 ];
 
@@ -237,10 +264,21 @@ const getProductInfo = (row) => {
 
 const getProductInfoRendered = (row) => {
 	let nameCode = row.Name === row.Code ? row.Name : `${row.Name} (${row.Code})`;
+
+	if (row.Type === 'Comment') {
+		return <Typography variant='body2'>{row.Description}</Typography>;
+	}
+
 	return (
-		<Box sx={{ display: 'grid', }}>
-			<Typography variant='body2' sx={{ fontWeight: 'bold' }}>{nameCode}</Typography>
-			<Typography variant='caption' sx={{ color: 'secondary', fontStyle: 'italic' }}>{row.Description}</Typography>
+		<Box sx={{ display: 'grid' }}>
+			<Typography variant='body2' sx={{ fontWeight: 'bold' }}>
+				{nameCode}
+			</Typography>
+			<Typography
+				variant='caption'
+				sx={{ color: 'secondary', fontStyle: 'italic' }}>
+				{row.Description}
+			</Typography>
 		</Box>
 	);
 };
@@ -252,9 +290,11 @@ const QuoteLineItemReport = ({
 	loadData,
 	variant,
 	onChange,
+	sortOrder,
 }) => {
 	return (
 		<CustomDataTable
+			hideFilterGraphic
 			formName='Quote_Line_Item'
 			height={maxHeight - 16}
 			forcedCriteria={forcedCriteria}
@@ -272,38 +312,26 @@ const QuoteLineItemReport = ({
 								d.Collapsible_Line_Items.map((x) => x.ID).includes(row.ID)
 						)[0];
 
-						return { ...row, hierarchy: [_parent.ID, row.ID] };
-						/*return {
-							...row,
-							hierarchy: [
-								`${getProductInfo(_parent)}_${_parent.ID}`,
-								getProductInfo(row),
-							],
-						};
-						*/
+						if (_parent) {
+							return { ...row, hierarchy: [_parent.ID, row.ID] };
+						}
 					}
 
 					return { ...row, hierarchy: [row.ID] };
-					//return { ...row, hierarchy: [getProductInfo(row)] };
 				})
 			}
 			DataGridProps={{
 				rowHeight: 44,
 				checkboxSelection: true,
 				disableSelectionOnClick: true,
-				// components: {
-				// 	Footer: CustomFooter,
-				// },
 				getRowClassName: ({ row }) => {
-					if(row.hierarchy.length > 1) {
+					if (row.hierarchy.length > 1) {
 						return 'action-row';
 					}
-					if(row.Type === 'Comment') {
+					if (row.Type === 'Comment') {
 						return 'info-row';
 					}
 				},
-					
-				isRowSelectable: ({ row }) => row.hierarchy.length === 1,
 				treeData: true,
 				getTreeDataPath: (row) => row.hierarchy,
 				groupingColDef: {
@@ -312,6 +340,39 @@ const QuoteLineItemReport = ({
 					align: 'center',
 					renderCell: (params) => <DataGridGroupToggleButton {...params} />,
 				},
+				isRowSelectable: ({ row }) => row.hierarchy.length === 1, //Cannot select assembly children
+				components: {
+					Footer: CustomFooter,
+				},
+			}}
+			SearchProps={{
+				hidden: true,
+			}}
+			RowGroupControlProps={{
+				show: true,
+				canExpand: (selections) =>
+					selections.filter((row) => row.Type === 'Assembly').length > 0,
+				onExpandFormatter: (rows) => {
+					//rows == selections, need to filter down to selected parents
+
+					return rows; //TODO
+				},
+				canCompress: (selections) =>
+					selections
+						.map((row) => row.Type !== 'Comment' && row.Type !== 'Assembly')
+						.filter((row) => row).length > 1,
+				onCompressFormatter: (rows) => {
+					//rows == selections
+
+					return rows; //TODO
+				},
+			}}
+			RowShiftControlProps={{
+				show: true,
+			}}
+			ActionProps={{
+				hideViews: true,
+				hideFilters: true,
 			}}
 			WrapperProps={{
 				elevation: 4,

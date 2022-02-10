@@ -120,14 +120,17 @@ export const notificationsState = atom({
 
 export const applicationTabsState = atom({
 	key: 'applicationTabsState',
-	default: [
+	default: null,
+	/*
+[
 		{
 			uuid: uuid(),
 			label: 'Dashboard',
 			type: 'dashboard',
-			reportName: 'Dashboard',
+			name: 'Dashboard',
 		},
 	]
+	*/
 })
 
 //#endregion

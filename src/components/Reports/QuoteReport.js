@@ -204,12 +204,13 @@ CustomFooter.propTypes = {
 	rows: PropTypes.array.isRequired,
 };
 
-const QuoteReport = ({ maxHeight, variant, forcedCriteria, loadData }) => {
+const QuoteReport = ({ maxHeight, variant, forcedCriteria, loadData, ignoreDefaultView }) => {
 	//! add
 	return (
 		<CustomDataTable
 			formName='Quote'
 			height={maxHeight - 16}
+			ignoreDefaultView={ignoreDefaultView}
 			forcedCriteria={forcedCriteria} //! add
 			loadDataOnAddNewRow={loadData} //! add
 			duplicateDialogComponent={(data, setData, open, onClose, onDuplicate) => (
@@ -381,6 +382,7 @@ const QuoteReport = ({ maxHeight, variant, forcedCriteria, loadData }) => {
 };
 
 QuoteReport.propTypes = {
+	ignoreDefaultView: PropTypes.bool,
 	maxHeight: PropTypes.number,
 	forcedCriteria: PropTypes.string,
 	loadData: PropTypes.object,

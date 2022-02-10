@@ -21,7 +21,7 @@ import { sum, currency, intTryParse, percent } from '../Helpers/functions';
 export const columns = [
 	{
 		field: 'Quote',
-		searchField: 'Quote_Name',
+		searchField: 'Quote.Name',
 		flex: 1,
 		valueGetter: ({ value }) => value.display_value || '',
 	},
