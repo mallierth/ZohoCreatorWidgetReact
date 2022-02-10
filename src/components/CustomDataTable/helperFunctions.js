@@ -114,10 +114,24 @@ export const filterValueFieldDisabled = (operator) => {
 	}
 };
 
-export const getCriteria = (type, operator, field, value1, value2) => {
+export const getCriteria = (
+	columnDef,
+	type,
+	operator,
+	field,
+	value1,
+	value2
+) => {
 	if (!operator || !field) {
 		return '';
 	}
+
+	if (columnDef) {
+		console.log('getCriteria() columnDef', columnDef);
+	}
+
+	const searchField = columnDef?.searchField ? columnDef.searchField : field;
+	const searchFieldIsArray = Array.isArray(searchField);
 
 	const wrappedValue1 =
 		type === 'number' || type === 'bool' || type === 'boolean'
@@ -135,128 +149,203 @@ export const getCriteria = (type, operator, field, value1, value2) => {
 
 	const emptyCriteria =
 		type === 'number'
-			? `${field} == null`
+			? searchFieldIsArray
+				? `(${searchField.map((x) => `${x} == null`).join(' || ')})`
+				: `${searchField} == null`
 			: type === 'date' || type === 'time' || type === 'dateTime'
-			? `(${field} == null || ${field} == '')`
-			: `(${field} == null || ${field} == "")`;
+			? searchFieldIsArray
+				? `(${searchField
+						.map((x) => `(${x} == null || ${x} == '')`)
+						.join(' || ')})`
+				: `(${searchField} == null || ${searchField} == '')`
+			: searchFieldIsArray
+			? `(${searchField
+					.map((x) => `(${x} == null || ${x} == "")`)
+					.join(' || ')})`
+			: `(${searchField} == null || ${searchField} == "")`;
 
 	const notEmptyCriteria =
 		type === 'number'
-			? `${field} != null`
+			? searchFieldIsArray
+				? `(${searchField.map((x) => `${x} != null`).join(' && ')})`
+				: `${searchField} != null`
 			: type === 'date' || type === 'time' || type === 'dateTime'
-			? `(${field} != null && ${field} != '')`
-			: `(${field} != null && ${field} != "")`;
+			? searchFieldIsArray
+				? `(${searchField
+						.map((x) => `(${x} != null && ${x} != '')`)
+						.join(' && ')})`
+				: `(${searchField} != null && ${searchField} != '')`
+			: searchFieldIsArray
+			? `(${searchField
+					.map((x) => `(${x} != null && ${x} != "")`)
+					.join(' && ')})`
+			: `(${searchField} != null && ${searchField} != "")`;
 
 	const dayJsFormat = type === 'date' ? 'l' : type === 'time' ? 'LT' : 'l LT';
 
 	switch (operator) {
 		case 'is me':
-			return `${field} == ${value1}`;
+			return `${searchField} == ${value1}`;
 		case 'is empty':
 			return emptyCriteria;
 		case 'is not empty':
 			return notEmptyCriteria;
 		case 'equals':
-			return `${field} == ${wrappedValue1}`;
+			return searchFieldIsArray
+				? `(${searchField.map((x) => `${x} == ${wrappedValue1}`).join(' || ')})`
+				: `${searchField} == ${wrappedValue1}`;
 		case 'not equal to':
-			return `${field} != ${wrappedValue1}`;
+			return searchFieldIsArray
+				? `(${searchField.map((x) => `${x} != ${wrappedValue1}`).join(' && ')})`
+				: `${searchField} != ${wrappedValue1}`;
 		case 'contains':
-			return `${field}.contains(${wrappedValue1})`;
+			return searchFieldIsArray
+				? `(${searchField
+						.map((x) => `${x}.contains(${wrappedValue1})`)
+						.join(' || ')})`
+				: `${searchField}.contains(${wrappedValue1})`;
 		case 'does not contain':
-			return `!${field}.contains(${wrappedValue1})`;
+			return searchFieldIsArray
+				? `(${searchField
+						.map((x) => `!${x}.contains(${wrappedValue1})`)
+						.join(' && ')})`
+				: `!${searchField}.contains(${wrappedValue1})`;
 		case 'starts with':
-			return `${field}.startsWith(${wrappedValue1})`;
+			return searchFieldIsArray
+				? `(${searchField
+						.map((x) => `${x}.startsWith(${wrappedValue1})`)
+						.join(' || ')})`
+				: `${searchField}.startsWith(${wrappedValue1})`;
 		case 'does not start with':
-			return `!${field}.startsWith(${wrappedValue1})`;
+			return searchFieldIsArray
+				? `(${searchField
+						.map((x) => `!${x}.startsWith(${wrappedValue1})`)
+						.join(' && ')})`
+				: `!${searchField}.startsWith(${wrappedValue1})`;
 		case 'ends with':
-			return `${field}.endsWith(${wrappedValue1})`;
+			return searchFieldIsArray
+				? `(${searchField
+						.map((x) => `${x}.endsWith(${wrappedValue1})`)
+						.join(' || ')})`
+				: `${searchField}.endsWith(${wrappedValue1})`;
 		case 'does not end with':
-			return `!${field}.endsWith(${wrappedValue1})`;
+			return searchFieldIsArray
+				? `(${searchField
+						.map((x) => `!${x}.endsWith(${wrappedValue1})`)
+						.join(' && ')})`
+				: `!${searchField}.endsWith(${wrappedValue1})`;
 
 		//type === "number"
 		case 'less than':
-			return `${field} < ${wrappedValue1}`;
+			return searchFieldIsArray
+				? `(${searchField.map((x) => `${x} < ${wrappedValue1}`).join(' || ')})`
+				: `${searchField} < ${wrappedValue1}`;
 		case 'less than or equal to':
-			return `${field} <= ${wrappedValue1}`;
+			return searchFieldIsArray
+				? `(${searchField.map((x) => `${x} <= ${wrappedValue1}`).join(' || ')})`
+				: `${searchField} <= ${wrappedValue1}`;
 		case 'greater than':
-			return `${field} > ${wrappedValue1}`;
+			return searchFieldIsArray
+				? `(${searchField.map((x) => `${x} > ${wrappedValue1}`).join(' || ')})`
+				: `${searchField} > ${wrappedValue1}`;
 		case 'greater than or equal to':
-			return `${field} >= ${wrappedValue1}`;
+			return searchFieldIsArray
+				? `(${searchField.map((x) => `${x} >= ${wrappedValue1}`).join(' || ')})`
+				: `${searchField} >= ${wrappedValue1}`;
 
 		//type === "date" || "time" || "dateTime"
 		case 'is before':
-			return `${field} <= ${wrappedValue1}`;
+			return searchFieldIsArray
+				? `(${searchField.map((x) => `${x} <= ${wrappedValue1}`).join(' || ')})`
+				: `${searchField} <= ${wrappedValue1}`;
 		case 'is after':
-			return `${field} >= ${wrappedValue1}`;
+			return searchFieldIsArray
+				? `(${searchField.map((x) => `${x} >= ${wrappedValue1}`).join(' || ')})`
+				: `${searchField} >= ${wrappedValue1}`;
 		case 'is between':
-			return `(${field} >= '${wrappedValue1}' && ${field} <= '${wrappedValue2}')`;
+			return searchFieldIsArray
+				? `(${searchField
+						.map(
+							(x) =>
+								`(${x} >= '${wrappedValue1}' && ${x} <= '${wrappedValue2}')`
+						)
+						.join(' || ')})`
+				: `(${searchField} >= '${wrappedValue1}' && ${searchField} <= '${wrappedValue2}')`;
 		case 'is not between':
-			return `(${field} < '${wrappedValue1}' && ${field} > '${wrappedValue2}')`;
+			return searchFieldIsArray
+				? `(${searchField
+						.map(
+							(x) => `(${x} < '${wrappedValue1}' && ${x} > '${wrappedValue2}')`
+						)
+						.join(' && ')})`
+				: `(${searchField} < '${wrappedValue1}' && ${searchField} > '${wrappedValue2}')`;
 		case 'today':
-			return `${field} = '${dayjs().format(dayJsFormat)}'`;
+			return `${searchField} = '${dayjs().format(dayJsFormat)}'`;
 		case 'tomorrow':
-			return `${field} = '${dayjs().add(1, 'day').format(dayJsFormat)}'`;
+			return `${searchField} = '${dayjs().add(1, 'day').format(dayJsFormat)}'`;
 		case 'starting tomorrow':
-			return `${field} >= '${dayjs().add(1, 'day').format(dayJsFormat)}'`;
+			return `${searchField} >= '${dayjs().add(1, 'day').format(dayJsFormat)}'`;
 		case 'yesterday':
-			return `${field} = '${dayjs().subtract(1, 'day').format(dayJsFormat)}'`;
+			return `${searchField} = '${dayjs()
+				.subtract(1, 'day')
+				.format(dayJsFormat)}'`;
 		case 'until yesterday':
-			return `${field} <= '${dayjs().add(1, 'day').format(dayJsFormat)}'`;
+			return `${searchField} <= '${dayjs().add(1, 'day').format(dayJsFormat)}'`;
 		case 'last month':
-			return `(${field} >= '${dayjs()
+			return `(${searchField} >= '${dayjs()
 				.subtract(1, 'month')
 				.startOf('month')
-				.format(dayJsFormat)}' && ${field} <= '${dayjs()
+				.format(dayJsFormat)}' && ${searchField} <= '${dayjs()
 				.subtract(1, 'month')
 				.endOf('month')
 				.format(dayJsFormat)}')`;
 		case 'current month':
-			return `(${field} >= '${dayjs()
+			return `(${searchField} >= '${dayjs()
 				.startOf('month')
-				.format(dayJsFormat)}' && ${field} <= '${dayjs()
+				.format(dayJsFormat)}' && ${searchField} <= '${dayjs()
 				.endOf('month')
 				.format(dayJsFormat)}')`;
 		case 'next month':
-			return `(${field} >= '${dayjs()
+			return `(${searchField} >= '${dayjs()
 				.add(1, 'month')
 				.startOf('month')
-				.format(dayJsFormat)}' && ${field} <= '${dayjs()
+				.format(dayJsFormat)}' && ${searchField} <= '${dayjs()
 				.add(1, 'month')
 				.endOf('month')
 				.format(dayJsFormat)}')`;
 		case 'last week':
-			return `(${field} >= '${dayjs()
+			return `(${searchField} >= '${dayjs()
 				.subtract(1, 'week')
 				.startOf('week')
-				.format(dayJsFormat)}' && ${field} <= '${dayjs()
+				.format(dayJsFormat)}' && ${searchField} <= '${dayjs()
 				.subtract(1, 'week')
 				.endOf('week')
 				.format(dayJsFormat)}')`;
 		case 'current week':
-			return `(${field} >= '${dayjs()
+			return `(${searchField} >= '${dayjs()
 				.startOf('week')
-				.format(dayJsFormat)}' && ${field} <= '${dayjs()
+				.format(dayJsFormat)}' && ${searchField} <= '${dayjs()
 				.endOf('week')
 				.format(dayJsFormat)}')`;
 		case 'next week':
-			return `(${field} >= '${dayjs()
+			return `(${searchField} >= '${dayjs()
 				.add(1, 'week')
 				.startOf('week')
-				.format(dayJsFormat)}' && ${field} <= '${dayjs()
+				.format(dayJsFormat)}' && ${searchField} <= '${dayjs()
 				.add(1, 'week')
 				.endOf('week')
 				.format(dayJsFormat)}')`;
 		case 'age in days':
-			return `(${field} >= '${dayjs()
+			return `(${searchField} >= '${dayjs()
 				.subtract(value1, 'day')
 				.startOf('day')
-				.format(dayJsFormat)}' && ${field} <= '${dayjs().format(
+				.format(dayJsFormat)}' && ${searchField} <= '${dayjs().format(
 				dayJsFormat
 			)}')`;
 		case 'due in days':
-			return `(${field} >= '${dayjs().format(
+			return `(${searchField} >= '${dayjs().format(
 				dayJsFormat
-			)}' && ${field} <= '${dayjs()
+			)}' && ${searchField} <= '${dayjs()
 				.add(value1, 'day')
 				.endOf('day')
 				.format(dayJsFormat)}')`;

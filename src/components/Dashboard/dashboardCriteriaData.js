@@ -548,6 +548,7 @@ export const serviceContractsLast30Days = {
 			operator: 'age in days',
 			value: '30',
 			criteriaString: getCriteria(
+				null,
 				'dateTime',
 				'age in days',
 				'Added_Time',
@@ -660,7 +661,7 @@ export const timeEntriesCurrentWeek = (currentUser) => ({
 			field: 'Date_field',
 			operator: 'current week',
 			value: '',
-			criteriaString: getCriteria('dateTime', 'current week', 'Date_field', ''),
+			criteriaString: getCriteria(null, 'dateTime', 'current week', 'Date_field', ''),
 		},
 		{
 			condition: 'AND',

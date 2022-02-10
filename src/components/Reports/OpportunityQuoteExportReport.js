@@ -21,6 +21,7 @@ import { sum, currency, intTryParse, percent } from '../Helpers/functions';
 export const columns = [
 	{
 		field: 'Quote',
+		searchField: 'Quote_Name',
 		flex: 1,
 		valueGetter: ({ value }) => value.display_value || '',
 	},
@@ -92,6 +93,7 @@ export const columns = [
 	},
 	{
 		field: 'Product',
+		searchField: ['Code', 'Name', 'Description'],
 		flex: 5,
 		valueGetter: ({ row }) => getProductInfo(row),
 		renderCell: ({ row }) => getProductInfoRendered(row),
@@ -290,6 +292,7 @@ const OpportunityQuoteExportReport = ({
 	return (
 		<CustomDataTable
 			disableOpenOnRowClick
+			disableRowRightClick
 			hideFilterGraphic
 			formName='Quote_Line_Item'
 			forcedCriteria={
@@ -312,7 +315,9 @@ const OpportunityQuoteExportReport = ({
 								d.Collapsible_Line_Items.map((x) => x.ID).includes(row.ID)
 						)[0];
 
-						return { ...row, hierarchy: [_parent.ID, row.ID] };
+						if(_parent) {
+							return { ...row, hierarchy: [_parent.ID, row.ID] };
+						}
 					}
 
 					return { ...row, hierarchy: [row.ID] };
@@ -339,6 +344,7 @@ const OpportunityQuoteExportReport = ({
 					align: 'center',
 					renderCell: (params) => <DataGridGroupToggleButton {...params} />,
 				},
+				isRowSelectable: ({ row }) => row.hierarchy.length === 1, //Cannot select assembly children
 				components: {
 					Footer: CustomFooter,
 				},
@@ -349,6 +355,7 @@ const OpportunityQuoteExportReport = ({
 			ActionProps={{
 				hideViews: true,
 				hideAdd: true,
+				hideEdit: true,
 				hideMassUpdate: true,
 				hideDelete: true,
 			}}

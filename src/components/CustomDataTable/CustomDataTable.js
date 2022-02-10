@@ -337,6 +337,7 @@ const CustomDataGrid = ({
 	overrideDefaultView, //Primarily for the dashboard to display specific views
 	defaultSelections, //for LookupField
 	disableOpenOnRowClick,
+	disableRowRightClick,
 
 	//Data exposed to the outside
 	onChange,
@@ -583,11 +584,6 @@ const CustomDataGrid = ({
 		if (activeFilters.length === 0) {
 			return '';
 		}
-
-		console.log(
-			'getReportCriteriaFromActiveFilters',
-			getReportCriteriaFromActiveFilters
-		);
 
 		//! Data structure below is detailed within PropTypes
 		const _reportCriteria = activeFilters
@@ -1038,18 +1034,17 @@ const CustomDataGrid = ({
 							onCheckIgnoreActiveFilters: (value) =>
 								setIgnoreActiveFilters(value),
 						}}
-
 						RowGroupControlProps={{
 							...RowGroupControlProps,
 							size: 'large',
 							color:
-							selectionModel.length > 0
-								? 'secondary.contrastText'
-								: 'secondary.main',
-							disabled: RowGroupControlProps.disabled || rowDataState?.status === 'fetching',
-							
+								selectionModel.length > 0
+									? 'secondary.contrastText'
+									: 'secondary.main',
+							disabled:
+								RowGroupControlProps.disabled ||
+								rowDataState?.status === 'fetching',
 						}}
-
 						RowShiftControlProps={{
 							...RowShiftControlProps,
 							size: 'large',
@@ -1057,12 +1052,10 @@ const CustomDataGrid = ({
 								selectionModel.length > 0
 									? 'secondary.contrastText'
 									: 'secondary.main',
-							disabled: RowGroupControlProps.disabled || rowDataState?.status === 'fetching',
-
+							disabled:
+								RowGroupControlProps.disabled ||
+								rowDataState?.status === 'fetching',
 						}}
-
-
-
 						ActionProps={{
 							...ActionProps,
 							size: 'large',
@@ -1259,16 +1252,20 @@ const CustomDataGrid = ({
 								rows: selections.length > 0 ? selections : rows,
 							},
 							row: {
-								onContextMenu: (e) => {
-									setContextMenuRow(
-										rows.filter(
-											(row) =>
-												row.ID === e.currentTarget.getAttribute('data-id')
-										)[0]
-									);
-									onContextMenu(e);
+								onContextMenu: disableRowRightClick
+									? null
+									: (e) => {
+											setContextMenuRow(
+												rows.filter(
+													(row) =>
+														row.ID === e.currentTarget.getAttribute('data-id')
+												)[0]
+											);
+											onContextMenu(e);
+									  },
+								style: {
+									cursor: disableRowRightClick ? 'auto' : 'context-menu',
 								},
-								style: { cursor: 'context-menu' },
 							},
 						}}
 						disableColumnMenu
@@ -1368,7 +1365,6 @@ const CustomDataGrid = ({
 						height={height}
 						columns={filterColumns}
 						data={filterDialogData}
-						onChange={(e) => console.log('FilterManager onChange', e)}
 						onApplyFilter={(e) => {
 							setActiveFilters(e);
 							setFilterDialogOpen(false);
@@ -1685,6 +1681,7 @@ CustomDataGrid.propTypes = {
 		PropTypes.string,
 	]),
 	disableOpenOnRowClick: PropTypes.bool,
+	disableRowRightClick: PropTypes.bool,
 
 	onChange: PropTypes.func,
 

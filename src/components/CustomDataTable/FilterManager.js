@@ -5,12 +5,6 @@ import PropTypes from 'prop-types';
 import { omit } from 'lodash-es';
 import { Box, Button, Fab, Paper, Toolbar, Tooltip } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import {
-	operators,
-	filterValueFieldRenderType,
-	filterValueFieldDisabled,
-	getCriteria,
-} from './helperFunctions';
 import CustomDataTableFilterRow from './CustomDataTableFilterRow2';
 //#endregion
 

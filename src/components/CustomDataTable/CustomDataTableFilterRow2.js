@@ -40,8 +40,14 @@ const CustomDataTableFilterRow = ({
 		fieldOptions.filter((op) => op.field === fieldValue).length > 0
 			? fieldOptions.filter((op) => op.field === fieldValue)[0]
 			: {};
-	const includeCurrentUserCriteria = fieldValue === 'Employee' || fieldValue === 'Employees' || fieldValue === 'Owner';
-	const operatorOptions = operators(fieldValueDefinition?.type, includeCurrentUserCriteria);
+	const includeCurrentUserCriteria =
+		fieldValue === 'Employee' ||
+		fieldValue === 'Employees' ||
+		fieldValue === 'Owner';
+	const operatorOptions = operators(
+		fieldValueDefinition?.type,
+		includeCurrentUserCriteria
+	);
 	const operatorValue = jsonData.operator;
 	const valueFieldToRender = filterValueFieldRenderType(
 		fieldValueDefinition?.type,
@@ -63,6 +69,12 @@ const CustomDataTableFilterRow = ({
 	const operatorError = !operatorValue;
 	const valueError = !valueDisabled && !value && value !== false && value !== 0;
 	//const value2Error = !valueDisabled && !value2;
+
+	const getFieldValueDefinition = (field) => {
+		return fieldOptions.filter((op) => op.field === field).length > 0
+			? fieldOptions.filter((op) => op.field === field)[0]
+			: {};
+	};
 
 	//? Errors
 	useEffect(() => {
@@ -117,6 +129,7 @@ const CustomDataTableFilterRow = ({
 						...jsonData,
 						field: e.target.value,
 						criteriaString: getCriteria(
+							getFieldValueDefinition(e.target.value),
 							valueFieldToRender,
 							jsonData.operator,
 							e.target.value,
@@ -147,6 +160,7 @@ const CustomDataTableFilterRow = ({
 						operator: e.target.value,
 						value: e.target.value === 'is me' ? currentUserId : jsonData.value,
 						criteriaString: getCriteria(
+							getFieldValueDefinition(jsonData.field),
 							valueFieldToRender,
 							e.target.value,
 							jsonData.field,
@@ -175,6 +189,7 @@ const CustomDataTableFilterRow = ({
 							...jsonData,
 							value: e.target.checked,
 							criteriaString: getCriteria(
+								getFieldValueDefinition(jsonData.field),
 								valueFieldToRender,
 								jsonData.operator,
 								jsonData.field,
@@ -200,6 +215,7 @@ const CustomDataTableFilterRow = ({
 							...jsonData,
 							value: e,
 							criteriaString: getCriteria(
+								getFieldValueDefinition(jsonData.field),
 								valueFieldToRender,
 								jsonData.operator,
 								jsonData.field,
@@ -228,6 +244,7 @@ const CustomDataTableFilterRow = ({
 							...jsonData,
 							value: operatorValue === 'is me' ? currentUserId : e.target.value,
 							criteriaString: getCriteria(
+								getFieldValueDefinition(jsonData.field),
 								valueFieldToRender,
 								jsonData.operator,
 								jsonData.field,
