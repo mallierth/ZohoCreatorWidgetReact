@@ -294,8 +294,15 @@ const QuoteLineItemReport = ({
 				// components: {
 				// 	Footer: CustomFooter,
 				// },
-				getRowClassName: ({ row }) =>
-					row.hierarchy.length > 1 ? 'action-row' : '',
+				getRowClassName: ({ row }) => {
+					if(row.hierarchy.length > 1) {
+						return 'action-row';
+					}
+					if(row.Type === 'Comment') {
+						return 'info-row';
+					}
+				},
+					
 				isRowSelectable: ({ row }) => row.hierarchy.length === 1,
 				treeData: true,
 				getTreeDataPath: (row) => row.hierarchy,
