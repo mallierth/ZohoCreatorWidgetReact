@@ -73,6 +73,16 @@ import RichTextField from '../RichText/RichTextField';
 
 //#region //TODO Mass update fields available
 const massUpdateCapableFieldKeys = [{ label: 'Description', value: 'Account' }];
+const defaultLoadData = {
+	Status: 'Active',
+	Alias: '',
+	Type: '',
+	Description: '',
+	Owner: '',
+	Price_Book_Items: '',
+	Return_Date: '',
+	Purchase_Order: '',
+}
 //#endregion
 
 //#region //TODO Helper functions
