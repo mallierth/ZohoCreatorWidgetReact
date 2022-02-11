@@ -268,7 +268,7 @@ const PurchaseReceiveForm = ({
 	);
 
 	const [massUpdateFieldList, setMassUpdateFieldList] = useState([]);
-	const requiredFields = useRef(columns.filter((column) => column.required));
+	const requiredFields = useRef(columns?.filter((column) => column.required));
 	const [error, setError] = useState({});
 	const [toastData, setToastData] = useState({});
 	const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
@@ -378,7 +378,7 @@ const PurchaseReceiveForm = ({
 										response.ID,
 										{
 											Line_Item_Order: JSON.stringify(
-												finalResponse.map((lineItem) => lineItem.ID)
+												finalResponse?.map((lineItem) => lineItem.ID)
 											),
 										},
 										() => {
@@ -501,9 +501,9 @@ const PurchaseReceiveForm = ({
 								option.value === value.value
 							}
 							onChange={(e, newValue) =>
-								setMassUpdateFieldList(newValue.map((v) => v.value))
+								setMassUpdateFieldList(newValue?.map((v) => v.value))
 							}
-							value={massUpdateCapableFieldKeys.filter((option) =>
+							value={massUpdateCapableFieldKeys?.filter((option) =>
 								massUpdateFieldList.includes(option.value) ? option : null
 							)}
 							renderInput={(params) => (
@@ -584,7 +584,7 @@ const PurchaseReceiveForm = ({
 										<TableCell>Ordered</TableCell>
 										<TableCell>Received</TableCell>
 										<TableCell>Quantity To Receive</TableCell>
-										{state?.currentData?.Purchase_Order_Line_Items.filter(
+										{state?.currentData?.Purchase_Order_Line_Items?.filter(
 											(lineItems) =>
 												lineItems['Price_Book_Item.Serialized'] === true ||
 												lineItems['Price_Book_Item.Serialized'] === 'true'
@@ -600,7 +600,7 @@ const PurchaseReceiveForm = ({
 									</TableRow>
 								</TableHead>
 								<TableBody>
-									{state?.currentData?.Purchase_Order_Line_Items.map(
+									{state?.currentData?.Purchase_Order_Line_Items?.map(
 										(lineItem) => (
 											<PurchaseReceiveLineItem
 												key={lineItem.ID}
@@ -612,7 +612,7 @@ const PurchaseReceiveForm = ({
 													mountData(`Serial_Numbers.${lineItem.ID}`, e)
 												}
 												showSerialNumberColumn={
-													state?.currentData?.Purchase_Order_Line_Items.filter(
+													state?.currentData?.Purchase_Order_Line_Items?.filter(
 														(lineItems) =>
 															lineItems['Price_Book_Item.Serialized'] ===
 																true ||

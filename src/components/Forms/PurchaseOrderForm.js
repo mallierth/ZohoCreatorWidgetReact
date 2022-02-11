@@ -1121,6 +1121,7 @@ const PurchaseOrderForm = ({
                       ID: id,
                       display_value: state.currentData.Name,
                     },
+					Purchase_Order_Line_Items: lineItemDataState.rows,
                   }}
                 />
               ) : tabValue === "Notes" ? (

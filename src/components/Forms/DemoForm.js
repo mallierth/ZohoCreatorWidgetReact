@@ -818,7 +818,6 @@ const DemoForm = ({
 												defaultSortByColumn='Name'
 												defaultValue={state.currentData.Purchase_Order}
 												onChange={(e) => mountData('Purchase_Order', e)}
-												multiSelect
 												endAdornment={
 													<IconButton edge='end' size='large'>
 														<DatabaseDefaultIcon form='Purchase_Order' />

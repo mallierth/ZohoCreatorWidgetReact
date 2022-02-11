@@ -1585,7 +1585,7 @@ const CustomTable = React.memo(
 			return;
 			duplicateRecord('Duplication_Requests', _dupeData, (successes) => {
 				const _successes = successes.map(
-					({ Result_Record_ID, Result_Record_Name }) => ({
+					({ Result_Record_ID, Result_Record_Name }, i) => ({
 						uuid: uuid(),
 						label: `${formName?.replaceAll('_', ' ')}: ${getNameFn(
 							formName,
@@ -1594,9 +1594,10 @@ const CustomTable = React.memo(
 						type: 'form',
 						id: Result_Record_ID,
 						name: formName,
+						active: i === successes.length - 1,
 					})
 				);
-				setApplicationTabs((old) => [...old, ..._successes]);
+				setApplicationTabs((old) => [...old.map(o => ({...o, active: false, })), ..._successes]);
 			});
 		};
 
@@ -2241,7 +2242,7 @@ const CustomTable = React.memo(
 				label: 'Edit in New Tabs',
 				icon: <Edit />,
 				onClick: () => {
-					const _selections = selections.map((selection) => ({
+					const _selections = selections.map((selection, i) => ({
 						uuid: uuid(),
 						label: `${formName?.replaceAll('_', ' ')}: ${getNameFn(
 							formName,
@@ -2251,8 +2252,9 @@ const CustomTable = React.memo(
 						id: selection.ID,
 						name: formName,
 						loadData: selection,
+						active: i === selections.length - 1,
 					}));
-					setApplicationTabs((old) => [...old, ..._selections]);
+					setApplicationTabs((old) => [...old.map(o => ({...o, active: false, })), ..._selections]);
 				},
 			},
 		];

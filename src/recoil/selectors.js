@@ -76,6 +76,19 @@ export const applicationTabLastUuidState = selector({
 	},
 });
 
+export const activeApplicationTabState = selector({
+	key: 'activeApplicationTabState',
+	get: ({ get }) => {
+		const applicationTabs = get(applicationTabsState);
+
+		if(applicationTabs.filter(tab => tab.active === true).length === 1){
+			return applicationTabs.filter(tab => tab.active === true)[0].uuid;
+		}
+
+		return applicationTabs[applicationTabs.length - 1].uuid;
+	},
+});
+
 export const themeModeState = selector({
 	key: 'themeModeState',
 	get: ({ get }) => {
