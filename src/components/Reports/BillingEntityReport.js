@@ -54,7 +54,7 @@ export const filterColumns = [...columns].sort((a, b) => {
 const NoteReport = ({ maxHeight, variant, forcedCriteria, loadData }) => {
 	return (
 		<CustomDataTable
-			formName='Billing_Entity'
+			formName='Note'
 			height={maxHeight - 16}
 			forcedCriteria={forcedCriteria}
 			loadDataOnAddNewRow={loadData}
