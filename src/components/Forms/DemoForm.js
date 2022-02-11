@@ -80,7 +80,7 @@ const defaultLoadData = {
 	Description: '',
 	Owner: '',
 	Price_Book_Items: '',
-	Return_Date: '',
+	Product_Return_Date: '',
 	Purchase_Order: '',
 }
 //#endregion
@@ -800,15 +800,15 @@ const DemoForm = ({
 											<TextFieldDateTime
 												type='date'
 												label='Return Date'
-												value={state.currentData.Return_Date}
-												onChange={(e) => mountData('Return_Date', e)}
+												value={state.currentData.Product_Return_Date}
+												onChange={(e) => mountData('Product_Return_Date', e)}
 												helperText={
-													error.Return_Date
+													error.Product_Return_Date
 														? 'Please enter a value for this required field'
 														: null
 												}
 												required
-												error={error.Return_Date}
+												error={error.Product_Return_Date}
 											/>
 										</Grid>
 										<Grid item xs={12}>
