@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { omit } from "lodash-es";
 import {
   sideNavEnabledState,
   navBarHeightState,
@@ -102,6 +103,7 @@ const App = () => {
   const themePrimaryColor = useRecoilValue(themePrimaryColorState);
   const themeSecondaryColor = useRecoilValue(themeSecondaryColorState);
   const [themeLoaded, setThemeLoaded] = useState(false);
+  const [forcedError, setForcedError] = useState(false);
 
   const widgetInitDuration = useRef(0);
   const [widgetInitDurationState, setWidgetInitDurationState] = useState(false);
@@ -124,16 +126,23 @@ const App = () => {
   useEffect(() => {
     console.log("applicationTabs change", applicationTabs);
 
-    if (
-      applicationTabs &&
-      lastUserAppState.current &&
-      JSON.stringify(applicationTabs) !==
+    if (applicationTabs && lastUserAppState.current) {
+      const _loadDataOmitKeys = ["Table_HTML"]; //? Object keys to omit from application tab state
+      const _applicationTabs = applicationTabs.map((tab) => ({
+        ...tab,
+        loadData: tab.loadData ? omit(tab.loadData, _loadDataOmitKeys) : {},
+      }));
+
+      //Added logic to compare stored tabs against formatted array of objects
+      if (
+        JSON.stringify(_applicationTabs) !==
         JSON.stringify(lastUserAppState.current)
-    ) {
-      updateRecord("Employees", currentUserId, {
-        Application_Tab_State: JSON.stringify(applicationTabs),
-      });
-      lastUserAppState.current = applicationTabs;
+      ) {
+        updateRecord("Employees", currentUserId, {
+          Application_Tab_State: JSON.stringify(_applicationTabs),
+        });
+        lastUserAppState.current = _applicationTabs;
+      }
     }
   }, [applicationTabs]);
 
@@ -179,7 +188,7 @@ const App = () => {
             response.employee.Application_Tab_State
           );
         } catch (err) {
-          throw new Error(err);
+          setForcedError(err);
         }
       }
       setWidgetStatus((old) => ({
@@ -189,6 +198,14 @@ const App = () => {
       }));
     })();
   }, [params]);
+
+  useEffect(() => {
+    if (forcedError) {
+      throw new Error(
+        "JSON.parse() failed on current employee's application tab state. Please talk to your system administrator about this issue!"
+      );
+    }
+  }, [forcedError]);
 
   //? On load, set the theme according to currentUser's settings
   useEffect(() => {
