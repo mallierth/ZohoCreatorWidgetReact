@@ -735,10 +735,7 @@ const AccountForm = ({
 																	display_value: state.currentData.Name,
 																},
 															],
-															Owner: {
-																ID: currentUser.ID,
-																display_value: currentUser.Full_Name,
-															},
+															Owner: currentUser.Full_Name,
 														}}
 													/>
 												),
