@@ -863,7 +863,10 @@ const CustomDataGrid = ({
               );
             }
 
-            if (exportColumn.valueFormatter) {
+            //? Prioritize number type just to make manual Excel manipulation easier
+            if(exportColumn.type === 'number') {
+              exportRow[exportColumn.field.replaceAll("_", " ")] = Number(row[exportColumn.field]);
+            } else if (exportColumn.valueFormatter) {
               exportRow[exportColumn.field.replaceAll("_", " ")] =
                 exportColumn.valueFormatter({
                   value: row[exportColumn.field],
