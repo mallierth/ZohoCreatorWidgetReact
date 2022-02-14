@@ -57,7 +57,7 @@ const TextFieldDateTime = ({
 				<TimePicker
 					label={label}
 					value={timeValue}
-					onChange={(newValue) => newValue ? onChange(newValue.format('LT')) : onChange('')}
+					onChange={(newValue) => newValue ? onChange(newValue.format('hh:mm:[00] A')) : onChange('')}
 					disabled={disabled}
 					readOnly={InputProps?.readOnly}
 					renderInput={(params) => (
@@ -77,7 +77,7 @@ const TextFieldDateTime = ({
 					label={label}
 					value={value}
 					onChange={(newValue) =>
-						newValue ? onChange(newValue.format('l LT')) : onChange('')
+						newValue ? onChange(newValue.format('MM/DD/YYYY hh:mm:[00] A')) : onChange('')
 					}
 					disabled={disabled}
 					readOnly={InputProps?.readOnly}
