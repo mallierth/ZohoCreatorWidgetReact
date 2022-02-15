@@ -82,7 +82,7 @@ import ConvertQuoteToSalesOrderDialog from '../Modals/ConvertQuoteToSalesOrderDi
 import RichTextField from '../RichText/RichTextField';
 import dayjs from 'dayjs';
 import QuoteLineItemReport from '../Reports/QuoteLineItemReport';
-import NoteReport from '../Reports/BillingEntityReport';
+import NoteReport from '../Reports/NoteReport';
 import EmailReport from '../Reports/EmailReport';
 import AttachmentReport from '../Reports/AttachmentReport';
 
