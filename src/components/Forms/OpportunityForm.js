@@ -88,7 +88,8 @@ import AttachmentReport from '../Reports/AttachmentReport';
 import QuoteReport from '../Reports/QuoteReport';
 import TaskReport from '../Reports/TaskReport';
 import OpportunityQuoteExportReport from '../Reports/OpportunityQuoteExportReport';
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
+import TimeEntryReport from '../Reports/TimeEntryReport';
 
 //#region //TODO Mass update fields available
 const massUpdateCapableFieldKeys = [
@@ -379,7 +380,7 @@ const OpportunityForm = ({
 
 	const openProjectInNewTab = () => {
 		setApplicationTabs((old) => [
-			...old.map(o => ({...o, active: false, })),
+			...old.map((o) => ({ ...o, active: false })),
 			{
 				uuid: uuidv4(),
 				label: 'Project: ' + state.currentData.Project.display_value,
@@ -393,7 +394,7 @@ const OpportunityForm = ({
 
 	const openServiceOrderInNewTab = () => {
 		setApplicationTabs((old) => [
-			...old.map(o => ({...o, active: false, })),
+			...old.map((o) => ({ ...o, active: false })),
 			{
 				uuid: uuidv4(),
 				label:
@@ -981,10 +982,10 @@ const OpportunityForm = ({
 									}}
 								/>
 							) : tabValue === 'Time Entries' ? (
-								<CustomTable
-									formName='Time_Entry'
-									defaultSortByColumn='Start'
-									defaultCriteria={`Reference==${
+								<TimeEntryReport
+									variant='tab'
+									maxHeight={600}
+									forcedCriteria={`Reference==${
 										state.savedData.Reference
 											? state.savedData.Reference.ID
 											: '0'
@@ -994,7 +995,6 @@ const OpportunityForm = ({
 											? `&& Phase==${id}`
 											: ''
 									}`}
-									tabTable
 								/>
 							) : null}
 						</TabbedSectionContent>
@@ -1073,7 +1073,9 @@ const OpportunityForm = ({
 				onClose={() => setExportQuotesDialogOpen(false)}>
 				<OpportunityQuoteExportReport
 					maxHeight={maxHeight - 51 - 16}
-					exportFilename={`${state.currentData.Name} Quotes Export ${dayjs().format("MM-DD-YY")}`}
+					exportFilename={`${
+						state.currentData.Name
+					} Quotes Export ${dayjs().format('MM-DD-YY')}`}
 					referenceId={state?.currentData?.Reference?.ID}
 					phaseId={
 						state?.currentData?.Enable_Phases === 'true' ||
