@@ -93,6 +93,7 @@ export const columns = [
 	},
 	{
 		field: 'Product',
+		searchField: ['Name', 'Code', ],
 		flex: 5,
 		valueGetter: ({ row }) => getProductInfo(row),
 		renderCell: ({ row }) => getProductInfoRendered(row),
@@ -248,9 +249,12 @@ const PurchaseOrderLineItemReport = ({
 	loadData,
 	variant,
 	onChange,
+	includeStatus,
+	...others
 }) => {
 	return (
 		<CustomDataTable
+			{...others}
 			formName='Purchase_Order_Line_Item'
 			height={maxHeight - 16}
 			forcedCriteria={forcedCriteria}
@@ -305,7 +309,7 @@ const PurchaseOrderLineItemReport = ({
 			WrapperProps={{
 				elevation: 4,
 			}}
-			columns={columns}
+			columns={includeStatus ? [...columns, { field: 'Purchase_Order.Status', headerName: 'PO Status', flex: 1, }] : columns}
 			filterColumns={filterColumns}
 			hideFilters={variant === 'tab'} //! add
 			hideSearch={variant === 'tab'} //! add
@@ -321,6 +325,7 @@ PurchaseOrderLineItemReport.propTypes = {
 	variant: PropTypes.oneOf(['tab']),
 	showActions: PropTypes.bool,
 	onChange: PropTypes.func,
+	includeStatus: PropTypes.bool,
 };
 
 export default PurchaseOrderLineItemReport;

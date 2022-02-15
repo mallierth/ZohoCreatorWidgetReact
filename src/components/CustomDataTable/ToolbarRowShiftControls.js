@@ -87,7 +87,7 @@ const TableActionButton = ({
 							);
 						}
 					}}>
-					<Icon />
+					{Icon}
 				</IconButton>
 
 				{enableContextMenu ? (
@@ -158,7 +158,7 @@ const TableActions = ({
 							tooltip='Shift to Top'
 							disabled={disableShiftTop || disabled}
 							onClick={onShiftTop}
-							Icon={FirstPage}
+							Icon={<FirstPage sx={{ transform: 'rotate(90deg)' }} />}
 							color={color}
 							size={size}
 						/>
@@ -170,7 +170,7 @@ const TableActions = ({
 							tooltip='Shift Up One Row'
 							disabled={disableShiftUp || disabled}
 							onClick={onShiftUp}
-							Icon={ChevronLeft}
+							Icon={<ChevronLeft sx={{ transform: 'rotate(90deg)' }} />}
 							color={color}
 							size={size}
 						/>
@@ -182,7 +182,7 @@ const TableActions = ({
 							tooltip='Shift Down One Row'
 							disabled={disableShiftDown || disabled}
 							onClick={onShiftDown}
-							Icon={ChevronRight}
+							Icon={<ChevronRight sx={{ transform: 'rotate(90deg)' }} />}
 							color={color}
 							size={size}
 						/>
@@ -194,16 +194,13 @@ const TableActions = ({
 							tooltip='Shift to Bottom'
 							disabled={disableShiftBottom || disabled}
 							onClick={onShiftBottom}
-							Icon={LastPage}
+							Icon={<LastPage sx={{ transform: 'rotate(90deg)' }} />}
 							color={color}
 							size={size}
 						/>
 					) : null}
 
-					<Divider
-						orientation='vertical'
-						flexItem
-					/>
+					<Divider orientation='vertical' flexItem />
 				</Stack>
 			) : null}
 		</Box>

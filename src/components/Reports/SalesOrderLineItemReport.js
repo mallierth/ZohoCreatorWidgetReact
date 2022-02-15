@@ -93,9 +93,16 @@ export const columns = [
 	},
 	{
 		field: 'Product',
+		searchField: ['Name', 'Code', ],
 		flex: 5,
 		valueGetter: ({ row }) => getProductInfo(row),
 		renderCell: ({ row }) => getProductInfoRendered(row),
+	},
+	{
+		field: 'Description',
+		flex: 5,
+		hide: true,
+		enableExport: true,
 	},
 	{
 		field: 'Quantity',
@@ -290,9 +297,12 @@ const SalesOrderLineItemReport = ({
 	loadData,
 	variant,
 	onChange,
+	includeStatus,
+	...others
 }) => {
 	return (
 		<CustomDataTable
+			{...others}
 			formName='Sales_Order_Line_Item'
 			height={maxHeight - 16}
 			forcedCriteria={forcedCriteria}
@@ -347,7 +357,7 @@ const SalesOrderLineItemReport = ({
 			WrapperProps={{
 				elevation: 4,
 			}}
-			columns={columns}
+			columns={includeStatus ? [...columns, { field: 'Sales_Order.Status', headerName: 'Sales Order Status', flex: 2, }] : columns}
 			filterColumns={filterColumns}
 			hideFilters={variant === 'tab'} //! add
 			hideSearch={variant === 'tab'} //! add
@@ -363,6 +373,7 @@ SalesOrderLineItemReport.propTypes = {
 	variant: PropTypes.oneOf(['tab']),
 	showActions: PropTypes.bool,
 	onChange: PropTypes.func,
+	includeStatus: PropTypes.bool,
 };
 
 export default SalesOrderLineItemReport;
