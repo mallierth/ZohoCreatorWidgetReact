@@ -1144,7 +1144,7 @@ const CustomDataGrid = ({
               hideEdit: ActionProps.hideEdit || selections.length === 0,
               //Mass Update
               onClickMassUpdate,
-              disableMassUpdate: reportName !== "Customer_Assets", //TODO Temporary
+              disableMassUpdate: reportName !== "Customer_Assets" && reportName !== "Time_Entries", //TODO Temporary
               hideMassUpdate:
                 ActionProps.hideMassUpdate || selections.length === 0,
               //Delete
