@@ -52,9 +52,9 @@ import {
 	Typography,
 } from '@mui/material';
 import {
-	Block,
 	ConfirmationNumber,
 	DeleteForever,
+	Description,
 	Devices,
 	VerifiedUser,
 } from '@mui/icons-material';
@@ -377,6 +377,21 @@ const ProjectForm = ({
 		]);
 	};
 
+	const openSourceOpportunityInNewTab = () => {
+		setApplicationTabs((old) => [
+			...old,
+			{
+				uuid: uuidv4(),
+				label:
+					'Opportunity: ' +
+					state?.currentData?.Source_Opportunity?.display_value,
+				type: 'form',
+				id: state.currentData.Source_Opportunity.ID,
+				name: 'Opportunity',
+			},
+		]);
+	};
+
 	const onDelete = () => {
 		console.log('TODO: onDelete');
 	};
@@ -411,6 +426,13 @@ const ProjectForm = ({
 								label: 'Project Audit',
 								onClick: () => setProjectAuditDialogOpen(true),
 								Icon: VerifiedUser,
+							},
+							{
+								type: 'form',
+								label: `Go to ${state?.currentData?.Source_Opportunity}`,
+								onClick: () => openSourceOpportunityInNewTab(),
+								hidden: !state?.currentData?.Source_Opportunity,
+								Icon: Description,
 							},
 							{
 								type: 'form',
