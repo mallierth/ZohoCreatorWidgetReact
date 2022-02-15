@@ -92,7 +92,7 @@ const defaultLoadData = {
 	Replacement_Sales_Order: '',
 	Replacement_Customer_Asset: '',
 	Purchase_Order: '',
-}
+};
 //#endregion
 
 //#region //TODO Helper functions
@@ -260,7 +260,11 @@ const RmaForm = ({
 	);
 	const debug = useRecoilValue(debugState);
 	const [alerts, setAlerts] = useState({});
-	const [data, setData] = useState({ ...defaultLoadData, ...loadData, ...resource.read() });
+	const [data, setData] = useState({
+		...defaultLoadData,
+		...loadData,
+		...resource.read(),
+	});
 	const [id, setId] = useState(data.ID);
 	const baseUrl = `https://creatorapp.zoho.com/visionpointllc/av-professional-services/#Page:Search?Type=${formName}&ID=${id}`;
 	//https://creatorapp.zoho.com/visionpointllc/av-professional-services/#Search1?Type=Quote&ID=3860683000011594075
@@ -272,7 +276,7 @@ const RmaForm = ({
 		mountData,
 		resetData,
 		massUpdateRecords,
-	] = useFormData(data, { ...defaultLoadData, ...loadData});
+	] = useFormData(data, { ...defaultLoadData, ...loadData });
 	const [lineItemDataState, lineItemDispatch] = useCustomTableLineItemFormData(
 		formName,
 		data
@@ -888,7 +892,26 @@ const RmaForm = ({
 										))}
 								</TextField>
 							</GridInputWrapper>
-							<GridInputWrapper></GridInputWrapper>
+							<GridInputWrapper
+								massUpdating={massUpdating}
+								hidden={
+									massUpdating &&
+									!massUpdateFieldList.includes('Purchase_Order')
+								}>
+								<LookupField2
+									name='Purchase_Order'
+									formName='Purchase_Order'
+									defaultSortByColumn='Name'
+									reportName='Purchase_Orders'
+									defaultValue={state.currentData.Purchase_Order}
+									onChange={(e) => mountData('Purchase_Order', e)}
+									endAdornment={
+										<IconButton edge='end' size='large'>
+											<DatabaseDefaultIcon form='Purchase_Order' />
+										</IconButton>
+									}
+								/>
+							</GridInputWrapper>
 
 							{/* Sections */}
 							<GridInputWrapper>
