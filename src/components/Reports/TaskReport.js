@@ -36,11 +36,13 @@ export const columns = [
 		field: 'Start',
 		type: 'dateTime',
 		flex: 2,
+		valueGetter: ({ value }) => value && new Date(value)
 	},
 	{
 		field: 'End',
 		type: 'dateTime',
 		flex: 2,
+		valueGetter: ({ value }) => value && new Date(value)
 	},
 	{
 		field: 'Description',
