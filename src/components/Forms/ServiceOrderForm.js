@@ -573,13 +573,14 @@ const ServiceOrderForm = ({
 		const id = accountData.ID;
 
 		setApplicationTabs((old) => [
-			...old,
+			...old.map(o => ({...o, active: false, })),
 			{
 				uuid: uuidv4(),
 				label: 'Account: ' + label,
 				type: 'form',
 				id,
 				name: 'Account',
+				active: true,
 			},
 		]);
 	};

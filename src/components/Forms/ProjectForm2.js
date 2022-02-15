@@ -364,7 +364,7 @@ const ProjectForm = ({
 	//#region //! Commands exposed by Actions dropdown
 	const openFirstYearWarrantyInNewTab = () => {
 		setApplicationTabs((old) => [
-			...old,
+			...old.map(o => ({...o, active: false})),
 			{
 				uuid: uuidv4(),
 				label:
@@ -373,13 +373,14 @@ const ProjectForm = ({
 				type: 'form',
 				id: state.currentData.First_Year_Warranty.ID,
 				name: 'Service_Contract',
+				active: true,
 			},
 		]);
 	};
 
 	const openSourceOpportunityInNewTab = () => {
 		setApplicationTabs((old) => [
-			...old,
+			...old.map(o => ({...o, active: false})),
 			{
 				uuid: uuidv4(),
 				label:
@@ -388,6 +389,7 @@ const ProjectForm = ({
 				type: 'form',
 				id: state.currentData.Source_Opportunity.ID,
 				name: 'Opportunity',
+				active: true,
 			},
 		]);
 	};
@@ -429,7 +431,7 @@ const ProjectForm = ({
 							},
 							{
 								type: 'form',
-								label: `Go to ${state?.currentData?.Source_Opportunity}`,
+								label: `Go to ${state?.currentData?.Source_Opportunity.display_value}`,
 								onClick: () => openSourceOpportunityInNewTab(),
 								hidden: !state?.currentData?.Source_Opportunity,
 								Icon: Description,

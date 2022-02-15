@@ -498,13 +498,14 @@ const QuoteForm = ({
 			: state?.currentData?.Converted_to?.ID;
 
 		setApplicationTabs((old) => [
-			...old,
+			...old.map(o => ({...o, active: false})),
 			{
 				uuid: uuidv4(),
 				label: 'Sales Order: ' + label,
 				type: 'form',
 				id,
 				name: 'Sales_Order',
+				active: true,
 			},
 		]);
 	};

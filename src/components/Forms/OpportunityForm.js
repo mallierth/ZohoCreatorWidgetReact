@@ -379,20 +379,21 @@ const OpportunityForm = ({
 
 	const openProjectInNewTab = () => {
 		setApplicationTabs((old) => [
-			...old,
+			...old.map(o => ({...o, active: false, })),
 			{
 				uuid: uuidv4(),
 				label: 'Project: ' + state.currentData.Project.display_value,
 				type: 'form',
 				id: state.currentData.Project.ID,
 				name: 'Project',
+				active: true,
 			},
 		]);
 	};
 
 	const openServiceOrderInNewTab = () => {
 		setApplicationTabs((old) => [
-			...old,
+			...old.map(o => ({...o, active: false, })),
 			{
 				uuid: uuidv4(),
 				label:
@@ -400,6 +401,7 @@ const OpportunityForm = ({
 				type: 'form',
 				id: state.currentData.Service_Order.ID,
 				name: 'Service_Order',
+				active: true,
 			},
 		]);
 	};
