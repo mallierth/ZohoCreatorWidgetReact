@@ -926,6 +926,8 @@ const QuoteForm = ({
 											display_value: state?.currentData?.Name,
 										},
 									}}
+									sortModel={JSON.parse(state?.currentData?.Line_Item_Order || [])}
+									onSortModelChange={(newModel) => mountData('Line_Item_Order', JSON.stringify(newModel || []))}
 								/>
 							) : tabValue === 'Notes' ? (
 								<NoteReport
