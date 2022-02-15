@@ -71,7 +71,7 @@ import WizardStep from '../Wizards/WizardStep';
 import ContextCircularProgressLoader from '../Loaders/ContextCircularProgressLoader';
 import RichTextField from '../RichText/RichTextField';
 import SalesOrderLineItemReport from '../Reports/SalesOrderLineItemReport';
-import NoteReport from '../Reports/BillingEntityReport';
+import NoteReport from '../Reports/NoteReport';
 import EmailReport from '../Reports/EmailReport';
 import AttachmentReport from '../Reports/AttachmentReport';
 
@@ -910,9 +910,9 @@ const SalesOrderForm = ({
 								<SalesOrderLineItemReport
 									variant='tab'
 									maxHeight={maxHeight}
-									forcedCriteria={`(Quote==${id} && Deleted=false)`}
+									forcedCriteria={`(Sales_Order==${id} && Deleted=false)`}
 									loadData={{
-										Quote: {
+										Sales_Order: {
 											ID: id,
 											display_value: state?.currentData?.Name,
 										},
