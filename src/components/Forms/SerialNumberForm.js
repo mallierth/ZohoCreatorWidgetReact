@@ -665,11 +665,22 @@ const SerialNumberForm = ({
 				}
 				open={searchOpen}
 				onClose={() => setSearchOpen(false)}>
-				<PurchaseReceiveLineItemReport
-					variant='tab'
-					maxHeight={maxHeight}
-					forcedCriteria={`Serial_Number_Entry.contains("${state.currentData.Value}")`}
-				/>
+				<Box>
+					<Typography>Purchase Receive Line Items:</Typography>
+					<PurchaseReceiveLineItemReport
+						disableOpenOnRowClick
+						disableRowRightClick
+						variant='tab'
+						maxHeight={maxHeight}
+						forcedCriteria={`Serial_Number_Entry.contains("${state.currentData.Value}")`}
+						ActionProps={{
+							hideAdd: true,
+							hideEdit: true,
+							hideMassUpdate: true,
+							hideDelete: true,
+						}}
+					/>
+				</Box>
 			</RenderPopup>
 
 			{/* Toast messaging in lower right */}
