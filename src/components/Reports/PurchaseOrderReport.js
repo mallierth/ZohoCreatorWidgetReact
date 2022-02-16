@@ -53,6 +53,7 @@ export const columns = [
 		headerName: 'Date',
 		type: 'date',
 		flex: 2,
+		valueGetter: ({ value }) => value && new Date(value)
 	},
 	{
 		field: 'Buyer',
