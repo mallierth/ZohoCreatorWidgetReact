@@ -67,6 +67,13 @@ export const columns = [
 export const filterColumns = [
 	...columns,
 	{
+		field: 'Added_Time',
+		headerName: 'Date Created',
+		type: 'dateTime',
+		flex: 2,
+		valueGetter: ({ value }) => value && new Date(value)
+	},
+	{
 		field: 'Comment',
 	},
 	{
