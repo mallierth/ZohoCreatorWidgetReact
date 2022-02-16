@@ -379,6 +379,7 @@ const CustomDataGrid = ({
 		selectionModel.length > 0
 			? rows.filter((row) => selectionModel.includes(row.ID))
 			: [];
+	const [_sortModel, setSortModel] = useState(sortModel);
 	//#endregion
 
 	//#region //* Saved Custom/Database Views
@@ -439,29 +440,82 @@ const CustomDataGrid = ({
 
 	//? Upon row change, raise onSortModelChange if defined
 	useEffect(() => {
+		if (sortModel) {
+			console.log('CustomDataTable.js props.sortModel', sortModel);
+			console.log('CustomDataTable.js _sortModel', _sortModel);
+		}
+	}, [sortModel]);
+
+	useEffect(() => {
+		let newRows = [];
+		if (_sortModel) {
+			newRows = sortBySortModel(rows);
+		}
+
 		if (onSortModelChange) {
 			if (
 				JSON.stringify(sortModel || []) !==
-				JSON.stringify(rows.length > 0 ? rows.map((row) => row.id) : [])
+				JSON.stringify(
+					newRows.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
+						.length > 0
+						? newRows
+								.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
+								.map((row) => row.id)
+						: []
+				)
 			) {
-				onSortModelChange(rows.length > 0 ? rows.map((row) => row.id) : []);
+				onSortModelChange(_sortModel);
 			}
 		}
-	}, [onSortModelChange, sortModel, rows]);
+	}, [_sortModel]);
 
-	//? Apply sortModel
-	useEffect(() => {
-		if (sortModel) {
-			setRows([...rows].sort((a, b) => {
-					return sortModel.indexOf(a.id) > sortModel.indexOf(b.id)
-						? 1
-						: sortModel.indexOf(a.id) < sortModel.indexOf(b.id)
-						? -1
-						: 0;
-				})
-			);
-		}
-	}, [sortModel, rows]);
+	const sortBySortModel = (rows) => {
+		const _rows = Array.from(rows);
+		const newRows = _rows
+			.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
+			.sort((a, b) => {
+				return _sortModel.indexOf(a.id) > _sortModel.indexOf(b.id)
+					? 1
+					: _sortModel.indexOf(a.id) < _sortModel.indexOf(b.id)
+					? -1
+					: 0;
+			});
+		setRows([
+			...newRows,
+			..._rows.filter((row) => row.hierarchy && row.hierarchy.length > 1),
+		]);
+		return newRows;
+	};
+
+	// //? Apply sortModel
+	// useEffect(() => {
+	// 	if (sortModel) {
+	// 		if (
+	// 			JSON.stringify(sortModel || []) !==
+	// 			JSON.stringify(
+	// 				rows.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
+	// 					.length > 0
+	// 					? rows
+	// 							.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
+	// 							.map((row) => row.id)
+	// 					: []
+	// 			)
+	// 		) {
+	// 			const temp = Array.from(rows);
+	// 			setRows(
+	// 				temp
+	// 					.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
+	// 					.sort((a, b) => {
+	// 						return sortModel.indexOf(a.id) > sortModel.indexOf(b.id)
+	// 							? 1
+	// 							: sortModel.indexOf(a.id) < sortModel.indexOf(b.id)
+	// 							? -1
+	// 							: 0;
+	// 					})
+	// 			);
+	// 		}
+	// 	}
+	// }, [rows]);
 
 	// Loading status
 	useEffect(() => {
@@ -653,11 +707,27 @@ const CustomDataGrid = ({
 
 		if (rowDataState.status === 'fetched') {
 			if (rowFormatter) {
-				setRows(
-					rowFormatter(rowDataState.data.map((row) => ({ ...row, id: row.ID })))
-				);
+				if (_sortModel) {
+					sortBySortModel(
+						rowFormatter(
+							rowDataState.data.map((row) => ({ ...row, id: row.ID }))
+						)
+					);
+				} else {
+					setRows(
+						rowFormatter(
+							rowDataState.data.map((row) => ({ ...row, id: row.ID }))
+						)
+					);
+				}
 			} else {
-				setRows(rowDataState.data.map((row) => ({ ...row, id: row.ID })));
+				if (_sortModel) {
+					sortBySortModel(
+						rowDataState.data.map((row) => ({ ...row, id: row.ID }))
+					);
+				} else {
+					setRows(rowDataState.data.map((row) => ({ ...row, id: row.ID })));
+				}
 			}
 		}
 
@@ -1118,7 +1188,14 @@ const CustomDataGrid = ({
 										result.splice(newIndex, 0, removedRow);
 									}
 								});
-								setRows(result);
+								//setRows(result);
+								setSortModel(
+									result
+										.filter(
+											(row) => !row.hierarchy || row.hierarchy.length === 1
+										)
+										.map((row) => row.id)
+								);
 							},
 							disableShiftUp:
 								RowShiftControlProps.disableShiftUp || selections.length === 0,
@@ -1135,7 +1212,14 @@ const CustomDataGrid = ({
 										result.splice(newIndex, 0, removedRow);
 									}
 								});
-								setRows(result);
+								//setRows(result);
+								setSortModel(
+									result
+										.filter(
+											(row) => !row.hierarchy || row.hierarchy.length === 1
+										)
+										.map((row) => row.id)
+								);
 							},
 							disableShiftDown:
 								RowShiftControlProps.disableShiftDown ||
@@ -1153,7 +1237,14 @@ const CustomDataGrid = ({
 										result.splice(newIndex, 0, removedRow);
 									}
 								});
-								setRows(result);
+								//setRows(result);
+								setSortModel(
+									result
+										.filter(
+											(row) => !row.hierarchy || row.hierarchy.length === 1
+										)
+										.map((row) => row.id)
+								);
 							},
 							disableShiftBottom:
 								RowShiftControlProps.disableShiftBottom ||
@@ -1173,7 +1264,14 @@ const CustomDataGrid = ({
 										result.splice(newIndex, 0, removedRow);
 									}
 								});
-								setRows(result);
+								//setRows(result);
+								setSortModel(
+									result
+										.filter(
+											(row) => !row.hierarchy || row.hierarchy.length === 1
+										)
+										.map((row) => row.id)
+								);
 							},
 						}}
 						ActionProps={{
