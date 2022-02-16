@@ -487,36 +487,6 @@ const CustomDataGrid = ({
 		return newRows;
 	};
 
-	// //? Apply sortModel
-	// useEffect(() => {
-	// 	if (sortModel) {
-	// 		if (
-	// 			JSON.stringify(sortModel || []) !==
-	// 			JSON.stringify(
-	// 				rows.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
-	// 					.length > 0
-	// 					? rows
-	// 							.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
-	// 							.map((row) => row.id)
-	// 					: []
-	// 			)
-	// 		) {
-	// 			const temp = Array.from(rows);
-	// 			setRows(
-	// 				temp
-	// 					.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
-	// 					.sort((a, b) => {
-	// 						return sortModel.indexOf(a.id) > sortModel.indexOf(b.id)
-	// 							? 1
-	// 							: sortModel.indexOf(a.id) < sortModel.indexOf(b.id)
-	// 							? -1
-	// 							: 0;
-	// 					})
-	// 			);
-	// 		}
-	// 	}
-	// }, [rows]);
-
 	// Loading status
 	useEffect(() => {
 		if (isLoading) {
