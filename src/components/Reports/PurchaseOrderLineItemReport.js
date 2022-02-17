@@ -249,7 +249,7 @@ const PurchaseOrderLineItemReport = ({
 	loadData,
 	variant,
 	onChange,
-	includeStatus,
+	additionalColumns,
 	...others
 }) => {
 	return (
@@ -309,7 +309,7 @@ const PurchaseOrderLineItemReport = ({
 			WrapperProps={{
 				elevation: 4,
 			}}
-			columns={includeStatus ? [...columns, { field: 'Purchase_Order.Status', headerName: 'PO Status', flex: 1, }] : columns}
+			columns={[...columns, ...additionalColumns]}
 			filterColumns={filterColumns}
 			hideFilters={variant === 'tab'} //! add
 			hideSearch={variant === 'tab'} //! add
@@ -325,7 +325,10 @@ PurchaseOrderLineItemReport.propTypes = {
 	variant: PropTypes.oneOf(['tab']),
 	showActions: PropTypes.bool,
 	onChange: PropTypes.func,
-	includeStatus: PropTypes.bool,
+	additionalColumns: PropTypes.array,
 };
 
+PurchaseOrderLineItemReport.defaultProps = {
+	additionalColumns: [],
+};
 export default PurchaseOrderLineItemReport;

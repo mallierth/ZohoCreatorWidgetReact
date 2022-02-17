@@ -21,7 +21,12 @@ import {
 	themeSecondaryColorState,
 	currentUserIdState,
 } from '../recoil/selectors';
-import { getCurrentUser, updateRecord } from '../apis/ZohoCreator';
+import {
+	getCurrentUser,
+	updateRecord,
+	accessTokenUrl,
+	generateAccessToken,
+} from '../apis/ZohoCreator';
 import MuiNavbar from './MuiNavbar';
 import {
 	createTheme,
@@ -177,8 +182,14 @@ const App = () => {
 		if (!params) {
 			return;
 		}
+
+		// if (!params.code) {
+		// 	window.open(accessTokenUrl, '_parent');
+		// }
+
 		setWidgetStatus((old) => ({ ...old, status: 'params assigned' }));
 		(async () => {
+			//console.log('generateAccessToken()', await generateAccessToken(params.code));
 			const response = await getCurrentUser(null, true).catch((err) =>
 				handleError(err)
 			);

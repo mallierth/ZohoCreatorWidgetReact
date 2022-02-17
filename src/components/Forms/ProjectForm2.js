@@ -24,6 +24,7 @@ import {
 	camelize,
 	intTryParse,
 	plurifyFormName,
+	sum,
 } from '../Helpers/functions';
 import {
 	AppBar,
@@ -1229,6 +1230,26 @@ const ProjectForm = ({
 						hideMassUpdate: true,
 						hideDelete: true,
 					}}
+					additionalColumns={[
+						{
+							field: 'Sales_Order.Status',
+							headerName: 'Sales Order Status',
+							flex: 2,
+						},
+						{
+							field: 'Quantity_Reserved',
+							headerName: 'Qty Filled',
+							type: 'number',
+							valueGetter: ({ row }) => {
+								if (Array.isArray(row.Quantity_Reserved)) {
+									return sum(row.Quantity_Reserved, 'display_value');
+								}
+
+								return 0;
+							},
+							flex: 0.5,
+						},
+					]}
 				/>
 			</RenderPopup>
 
@@ -1270,6 +1291,13 @@ const ProjectForm = ({
 						hideMassUpdate: true,
 						hideDelete: true,
 					}}
+					additionalColumns={[
+						{
+							field: 'Purchase_Order.Status',
+							headerName: 'PO Status',
+							flex: 1,
+						},
+					]}
 				/>
 			</RenderPopup>
 

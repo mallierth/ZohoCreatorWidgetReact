@@ -1039,6 +1039,7 @@ export const useZohoGetAllRecords = (
 	pageSize = 200
 ) => {
 	const cache = useRef({});
+	const test = useRef([]);
 	const initialState = {
 		status: 'idle',
 		error: null,
@@ -1069,6 +1070,7 @@ export const useZohoGetAllRecords = (
 					pageWithError: 0,
 				};
 			case 'FETCHED':
+				console.warn('Fetched:', test?.current);
 				return {
 					...state,
 					status: 'fetched',
@@ -1105,7 +1107,7 @@ export const useZohoGetAllRecords = (
 		let defaultValueIdArray = defaultValueParse.idArray;
 
 		(async () => {
-			dispatch({ type: 'FETCHING', payload: defaultValueCriteria });
+			dispatch({ type: 'FETCHING', payload: defaultValueCriteria }); //! Generate new uuid here
 			if (
 				cache.current[
 					`${reportName}${criteria}${defaultValueCriteria}${page}${pageSize}`
@@ -1211,7 +1213,9 @@ export const useZohoGetAllRecords = (
 							type: 'FETCHING',
 							payload: `${i}`,
 							criteria: config.criteria,
+							//! uuid is unchanged for pages fetches
 						});
+						test.current.push(config);
 						let noResults = false;
 						let response = await ZOHO.CREATOR.API.getAllRecords(config).catch(
 							(err) => {
