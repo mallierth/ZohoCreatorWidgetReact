@@ -129,7 +129,7 @@ const App = () => {
 	}, []);
 
 	useEffect(() => {
-		console.log('applicationTabs change', applicationTabs);
+		console.log('applicationTabs change HI AZURE', applicationTabs);
 
 		if (applicationTabs && lastUserAppState.current) {
 			const _loadDataOmitKeys = [
