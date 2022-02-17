@@ -93,7 +93,7 @@ export const columns = [
 	},
 	{
 		field: 'Product',
-		searchField: ['Name', 'Code', ],
+		searchField: ['Name', 'Code'],
 		flex: 5,
 		valueGetter: ({ row }) => getProductInfo(row),
 		renderCell: ({ row }) => getProductInfoRendered(row),
@@ -297,7 +297,7 @@ const SalesOrderLineItemReport = ({
 	loadData,
 	variant,
 	onChange,
-	includeStatus,
+	additionalColumns,
 	...others
 }) => {
 	return (
@@ -357,7 +357,7 @@ const SalesOrderLineItemReport = ({
 			WrapperProps={{
 				elevation: 4,
 			}}
-			columns={includeStatus ? [...columns, { field: 'Sales_Order.Status', headerName: 'Sales Order Status', flex: 2, }] : columns}
+			columns={[...columns, ...additionalColumns]}
 			filterColumns={filterColumns}
 			hideFilters={variant === 'tab'} //! add
 			hideSearch={variant === 'tab'} //! add
@@ -373,7 +373,11 @@ SalesOrderLineItemReport.propTypes = {
 	variant: PropTypes.oneOf(['tab']),
 	showActions: PropTypes.bool,
 	onChange: PropTypes.func,
-	includeStatus: PropTypes.bool,
+	additionalColumns: PropTypes.array,
+};
+
+SalesOrderLineItemReport.defaultProps = {
+	additionalColumns: [],
 };
 
 export default SalesOrderLineItemReport;
