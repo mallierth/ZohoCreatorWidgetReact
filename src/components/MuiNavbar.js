@@ -11,7 +11,7 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Slide, Stack, Tooltip } from '@mui/material';
+import { Collapse, Slide, Stack, Tooltip } from '@mui/material';
 import {
 	AddComment,
 	Help,
@@ -41,6 +41,8 @@ import { focusPop } from './Helpers/animations';
 import ResponsiveDialog from './Modals/ResponsiveDialog';
 import { ToolbarTitle } from './CustomDataTable/CustomDataTable';
 import { getAllRecords } from '../apis/ZohoCreator';
+import NotificationsDrawer from './Notifications/Drawer';
+import NotificationsCard from './Notifications/Card';
 
 const sx = {
 	grow: { flexGrow: 1 },
@@ -109,19 +111,24 @@ const MuiNavbar = ({ open, handleDrawerOpen, handleDrawerToggle }) => {
 		notifications.length > 0
 			? notifications.filter(
 					(notification) =>
-						!notification.Seen_By ||
-						!notification.Seen_By.map((x) => x.ID).includes(currentUser.ID)
+						notification.Visible_For &&
+						notification.Visible_For.map((x) => x.ID).includes(currentUser.ID)
 			  ).length
 			: 0;
+	const [notificationsOpen, setNotificationsOpen] = useState(false);
 
 	useEffect(() => {
 		(async () => {
 			const response = await getAllRecords(
 				'Notifications',
-				`(!Hidden_By.contains(${currentUser.ID}) || Hidden_By == "" || Hidden_By == null) && ${currentUser.Subscribed_Notification_Groups.map(group => `Group.contains("${group}")`).join(' || ')}` //!Hidden_By.contains(${currentUser.ID}) && 
+				`Visible_For.contains(${
+					currentUser.ID
+				}) && ${currentUser.Subscribed_Notification_Groups.map(
+					(group) => `Group.contains("${group}")`
+				).join(' || ')}`
 			);
-			if(response.data) {
-				setNotifications(response.data);
+			if (response) {
+				setNotifications(response);
 			}
 			console.log('Notifications:', response);
 		})();
@@ -130,12 +137,17 @@ const MuiNavbar = ({ open, handleDrawerOpen, handleDrawerToggle }) => {
 	useEffect(() => {
 		const interval = setInterval(() => {
 			(async () => {
+				//!Hidden_By.contains(${currentUser.ID}) ||
 				const response = await getAllRecords(
 					'Notifications',
-					`(!Hidden_By.contains(${currentUser.ID}) || Hidden_By == "" || Hidden_By == null) && ${currentUser.Subscribed_Notification_Groups.map(group => `Group.contains("${group}")`).join(' || ')}` //
+					`Visible_For.contains(${
+						currentUser.ID
+					}) && ${currentUser.Subscribed_Notification_Groups.map(
+						(group) => `Group.contains("${group}")`
+					).join(' || ')}`
 				);
-				if(response.data) {
-					setNotifications(response.data);
+				if (response) {
+					setNotifications(response);
 				}
 				console.log('Notifications:', response);
 			})();
@@ -168,7 +180,11 @@ const MuiNavbar = ({ open, handleDrawerOpen, handleDrawerToggle }) => {
 			</MenuItem> */}
 			{currentUserIsAdmin ? (
 				<MenuItem>
-					<IconButton color='inherit' sx={{ pr: 2 }} size='large'>
+					<IconButton
+						color='inherit'
+						sx={{ pr: 2 }}
+						size='large'
+						onClick={() => setNotificationsOpen(true)}>
 						<Badge badgeContent={notificationCount} color='error'>
 							<Notifications />
 						</Badge>
@@ -248,7 +264,10 @@ const MuiNavbar = ({ open, handleDrawerOpen, handleDrawerToggle }) => {
 												direction='down'
 												style={{ transitionDelay: '600ms' }}
 												timeout={400}>
-												<IconButton color='inherit' size='large'>
+												<IconButton
+													color='inherit'
+													size='large'
+													onClick={() => setNotificationsOpen(true)}>
 													<Badge badgeContent={notificationCount} color='error'>
 														<Notifications />
 													</Badge>
@@ -332,6 +351,26 @@ const MuiNavbar = ({ open, handleDrawerOpen, handleDrawerToggle }) => {
 			</ResponsiveDialog>
 
 			<HelpDocs open={helpDocsModal} onClose={() => setHelpDocsModal(false)} />
+
+			<NotificationsDrawer
+				open={notificationsOpen}
+				onClose={() => setNotificationsOpen(false)}>
+				<TransitionGroup>
+					{notifications.map((notification) => (
+						<Collapse key={notification.ID}>
+							<NotificationsCard
+								author={notification.Author}
+								title={notification.Title}
+								subtitle={notification.Subtitle}
+								content={notification.Content}
+								read={notification.Read_By && notification.Read_By.map(readBy => readBy.ID).includes(currentUser.ID)}
+								onRead={() => console.log('Mark notification as read')}
+								onHide={() => console.log('Remove user from Visible_For array')}
+							/>
+						</Collapse>
+					))}
+				</TransitionGroup>
+			</NotificationsDrawer>
 		</>
 	);
 };

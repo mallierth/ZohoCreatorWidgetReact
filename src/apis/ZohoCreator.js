@@ -255,9 +255,9 @@ export const getAllRecords = async (
 				return [];
 			}
 		);
-
+		console.log('ZohoCreator.js getAllRecords response', response);
 		if (response && response.code === 3000) {
-			console.log('ZohoCreator.js getAllRecords response', response);
+			
 			returnArr = [
 				...returnArr,
 				...response.data.map((data) => ({
