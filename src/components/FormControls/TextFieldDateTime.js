@@ -21,14 +21,18 @@ const TextFieldDateTime = ({
 	InputProps,
 	helperText,
 }) => {
-	const [timeValue, setTimeValue] = useState(value ? dayjs(`${dayjs().format('L')} ${value}`).format('L LT') : null);
+	const [timeValue, setTimeValue] = useState(
+		value ? dayjs(`${dayjs().format('L')} ${value}`).format('L LT') : null
+	);
 
 	useEffect(() => {
-		if(type === 'time') {
+		if (type === 'time') {
 			console.log('value change', value, timeValue);
-			setTimeValue(value ? dayjs(`${dayjs().format('L')} ${value}`).format('L LT') : null);
+			setTimeValue(
+				value ? dayjs(`${dayjs().format('L')} ${value}`).format('L LT') : null
+			);
 		}
-	}, [value])
+	}, [value]);
 
 	return (
 		<LocalizationProvider dateAdapter={DateAdapter}>
@@ -57,7 +61,9 @@ const TextFieldDateTime = ({
 				<TimePicker
 					label={label}
 					value={timeValue}
-					onChange={(newValue) => newValue ? onChange(newValue.format('hh:mm:[00] A')) : onChange('')}
+					onChange={(newValue) =>
+						newValue ? onChange(newValue.format('hh:mm:[00] A')) : onChange('')
+					}
 					disabled={disabled}
 					readOnly={InputProps?.readOnly}
 					renderInput={(params) => (
@@ -77,7 +83,9 @@ const TextFieldDateTime = ({
 					label={label}
 					value={value}
 					onChange={(newValue) =>
-						newValue ? onChange(newValue.format('MM/DD/YYYY hh:mm:[00] A')) : onChange('')
+						newValue
+							? onChange(newValue.format('MM/DD/YYYY hh:mm:[00] A'))
+							: onChange('')
 					}
 					disabled={disabled}
 					readOnly={InputProps?.readOnly}
