@@ -58,8 +58,9 @@ import EstimateReport from './Reports/EstimateReport';
 import ExpenseReport from './Reports/ExpenseReport';
 import ManufacturerReport from './Reports/ManufacturerReport';
 import InventoryAdjustmentReport from './Reports/InventoryAdjustmentReport';
-import PriceBookItemReport from './Reports/PriceBookItemReport';
 import OpportunityReport from './Reports/OpportunityReport';
+import PortalUserReport from './Reports/PortalUserReport';
+import PriceBookItemReport from './Reports/PriceBookItemReport';
 import ProjectReport from './Reports/ProjectReport';
 import PurchaseOrderReport from './Reports/PurchaseOrderReport';
 import PurchaseReceiveReport from './Reports/PurchaseReceiveReport';
@@ -83,7 +84,7 @@ LicenseInfo.setLicenseKey(
 	'cfd89a4ae50972f34543a5275d31950dT1JERVI6Mjk3NDAsRVhQSVJZPTE2NjM4NTU4ODQwMDAsS0VZVkVSU0lPTj0x'
 );
 
-const INTERVAL_DURATION = 1000 * 60 * 5; //1000ms * 60s/minute * n desired minutes (5 minutes)
+const INTERVAL_DURATION = 1000 * 60 * 1; //1000ms * 60s/minute * n desired minutes (5 minutes)
 
 const App = () => {
 	const handleError = useErrorHandler();
@@ -118,6 +119,12 @@ const App = () => {
 
 	useEffect(() => {
 		//setPageType(rootDiv.replace('root', ''));
+
+		// if(localStorage?.test) {
+		// 	console.log('localStorage', localStorage);
+		// } else {
+		// 	localStorage.test = window.location.href;
+		// }
 
 		(async () => {
 			if (!params) {
@@ -481,6 +488,17 @@ const App = () => {
 				return (
 					<React.Suspense fallback={<Loader show />}>
 						<OpportunityReport maxHeight={maxHeight} maxWidth={maxWidth} />
+					</React.Suspense>
+				);
+			case 'Portal_Users':
+				//Render a record
+				if (params.ID) {
+					return <RenderForm id={params.ID} formName={'Portal_User'} />;
+				}
+				//Render a report
+				return (
+					<React.Suspense fallback={<Loader show />}>
+						<PortalUserReport maxHeight={maxHeight} maxWidth={maxWidth} />
 					</React.Suspense>
 				);
 			case 'Price_Book_Items':
