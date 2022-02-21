@@ -10,8 +10,10 @@ import {
 	AutoFixHigh,
 	Biotech,
 	Build,
+	BuildCircle,
 	Business,
 	ChangeCircle,
+	CloudCircle,
 	CommentBank,
 	ConfirmationNumber,
 	Dashboard,
@@ -26,7 +28,6 @@ import {
 	LocalShipping,
 	LocationCity,
 	MeetingRoom,
-	MonetizationOn,
 	MoreTime,
 	PendingActions,
 	Person,
@@ -34,7 +35,6 @@ import {
 	PrecisionManufacturing,
 	Print,
 	RequestQuote,
-	Schedule,
 	Search,
 	ShoppingCart,
 	Storage,
@@ -88,6 +88,8 @@ const DatabaseDefaultIcon = ({ form, sx, ...others }) => {
 			return <Description sx={sx} {...others} />;
 		case 'Pick_Ticket':
 			return <ConfirmationNumber sx={sx} {...others} />;
+		case 'Portal_User':
+			return <CloudCircle sx={sx} {...others} />;
 		case 'Price_Book_Item':
 			return <LocalOffer sx={sx} {...others} />;
 		case 'Priority':
@@ -126,6 +128,8 @@ const DatabaseDefaultIcon = ({ form, sx, ...others }) => {
 			return <Assignment sx={sx} {...others} />;
 		case 'Service_Order':
 			return <Handyman sx={sx} {...others} />;
+		case 'Service_Request':
+			return <BuildCircle sx={sx} {...others} />;
 		case 'Subcontractor':
 			return <PersonOutline sx={sx} {...others} />;
 		case 'Subscription':
