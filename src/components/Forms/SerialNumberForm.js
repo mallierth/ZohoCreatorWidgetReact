@@ -44,6 +44,7 @@ import {
 	MoreVert,
 	Print,
 	Restore,
+	Search,
 	Share,
 } from '@mui/icons-material';
 import TabbedSectionHeader from '../TabbedSection/TabbedSectionHeader';
@@ -70,6 +71,12 @@ import WizardDialog from '../Wizards/WizardDialog';
 import WizardStep from '../Wizards/WizardStep';
 import ContextCircularProgressLoader from '../Loaders/ContextCircularProgressLoader';
 import RichTextField from '../RichText/RichTextField';
+import CustomFormActions from '../FormControls/CustomFormActions';
+import NoteReport from '../Reports/NoteReport';
+import EmailReport from '../Reports/EmailReport';
+import AttachmentReport from '../Reports/AttachmentReport';
+import PurchaseReceiveLineItemReport from '../Reports/PurchaseReceiveLineItemReport';
+import { currentUserIsAdminState } from '../../recoil/selectors';
 
 //#region //TODO Mass update fields available
 const massUpdateCapableFieldKeys = [{ label: 'Description', value: 'Account' }];
@@ -77,150 +84,6 @@ const massUpdateCapableFieldKeys = [{ label: 'Description', value: 'Account' }];
 
 //#region //TODO Helper functions
 
-//#endregion
-
-//#region //TODO Custom actions in form toolbar
-const CustomFormActions = ({
-	currentData,
-	currentUser,
-	onCopyDirectUrl,
-	onprintWizardOpen,
-	onOpenSendEmail,
-	onVoid,
-	onDelete,
-
-	//Form Specific
-}) => {
-	const theme = useTheme();
-	const desktopMode = useMediaQuery(theme.breakpoints.up('sm'));
-	const [anchorEl, setAnchorEl] = useState(null);
-	const [open, setOpen] = useState(false);
-
-	const onClose = () => {
-		setAnchorEl(null);
-		setOpen(false);
-	};
-
-	const onOpen = (e) => {
-		setAnchorEl(e.currentTarget);
-		setOpen(true);
-	};
-
-	const _onCopyDirectUrl = () => {
-		onClose();
-		onCopyDirectUrl();
-	};
-
-	const _onprintWizardOpen = () => {
-		onClose();
-		onprintWizardOpen();
-	};
-
-	const _onOpenSendEmail = () => {
-		onClose();
-		onOpenSendEmail();
-	};
-
-	const _onVoid = () => {
-		onClose();
-		onVoid();
-	};
-
-	const _onDelete = () => {
-		onClose();
-		onDelete();
-	};
-
-	useEffect(() => {
-		desktopMode ? onClose() : null;
-	}, [desktopMode]);
-
-	return (
-		<>
-			{desktopMode ? (
-				<Button
-					//variant='contained'
-					onClick={onOpen}
-					startIcon={<ExpandMore />}>
-					Actions
-				</Button>
-			) : (
-				<Tooltip arrow title={'Actions'}>
-					<IconButton onClick={onOpen} color='inherit' size='small'>
-						<MoreVert />
-					</IconButton>
-				</Tooltip>
-			)}
-
-			<Menu anchorEl={anchorEl} open={open} onClose={onClose}>
-				{/* Copy Direct Link/Print/Email */}
-				{/* <MenuItem onClick={_onCopyDirectUrl}>
-					<ListItemIcon>
-						<Share color='success' fontSize='small' />
-					</ListItemIcon>
-					<ListItemText>Copy Direct Link</ListItemText>
-				</MenuItem> */}
-				{/* <MenuItem onClick={_onprintWizardOpen}>
-					<ListItemIcon>
-						<Print color='success' fontSize='small' />
-					</ListItemIcon>
-					<ListItemText>Print Wizard</ListItemText>
-				</MenuItem>
-				<MenuItem onClick={_onOpenSendEmail}>
-					<ListItemIcon>
-						<Email color='success' fontSize='small' />
-					</ListItemIcon>
-					<ListItemText>Send Email</ListItemText>
-				</MenuItem>
-				<Divider /> */}
-				{/* Record Specific Options */}
-
-				{/* Void/Delete Options */}
-				{/* <MenuItem
-					onClick={_onVoid}
-					disabled={
-						(currentData.Void_field === true ||
-							currentData.Void_field === 'true') &&
-						currentUser.Admin !== true &&
-						currentUser.Admin !== 'true'
-					}>
-					<ListItemIcon>
-						{currentData.Void_field === true ||
-						currentData.Void_field === 'true' ? (
-							<Restore color='warning' fontSize='small' />
-						) : (
-							<Block color='warning' fontSize='small' />
-						)}
-					</ListItemIcon>
-					<ListItemText>
-						{currentData.Void_field === true ||
-						currentData.Void_field === 'true'
-							? 'UNVOID'
-							: 'Void'}
-					</ListItemText>
-				</MenuItem> */}
-				{currentUser.Admin === true || currentUser.Admin === 'true' ? (
-					<MenuItem onClick={_onDelete}>
-						<ListItemIcon>
-							<DeleteForever color='error' fontSize='small' />
-						</ListItemIcon>
-						<ListItemText>Delete</ListItemText>
-					</MenuItem>
-				) : null}
-			</Menu>
-		</>
-	);
-};
-
-CustomFormActions.propTypes = {
-	currentData: PropTypes.object,
-	currentUser: PropTypes.object,
-	onCopyDirectUrl: PropTypes.func,
-	onprintWizardOpen: PropTypes.func,
-	onOpenSendEmail: PropTypes.func,
-	onVoid: PropTypes.func,
-	onDelete: PropTypes.func,
-};
 //#endregion
 
 const SerialNumberForm = ({
@@ -235,6 +98,7 @@ const SerialNumberForm = ({
 	maxHeight,
 }) => {
 	const currentUser = useRecoilValue(currentUserState);
+	const currentUserIsAdmin = useRecoilValue(currentUserIsAdminState);
 	const columns = useRecoilValue(
 		Columns[`${camelize(formName.replaceAll('_', ''))}ColumnsState`]
 	);
@@ -268,6 +132,7 @@ const SerialNumberForm = ({
 	const [tabValue, setTabValue] = useState('Notes');
 	const [emailWizardOpen, setEmailWizardOpen] = useState(false);
 	const [printWizardOpen, setPrintWizardOpen] = useState(false);
+	const [searchOpen, setSearchOpen] = useState(false);
 	const [wizard, setWizard] = useState({ open: false, activeStep: 0 });
 	const hasError = Object.keys(error).length > 0;
 
@@ -613,13 +478,21 @@ const SerialNumberForm = ({
 				disabled={false}
 				CustomFormActions={
 					<CustomFormActions
-						currentData={state.currentData}
-						currentUser={currentUser}
-						onCopyDirectUrl={onCopyDirectUrl}
-						onprintWizardOpen={onprintWizardOpen}
-						onOpenSendEmail={onOpenSendEmail}
-						onVoid={onVoid}
-						onDelete={onDelete}
+						options={[
+							{
+								type: 'form',
+								label: 'Search',
+								onClick: () => setSearchOpen(true),
+								Icon: Search,
+							},
+							{
+								type: 'void',
+								label: 'Delete',
+								onClick: () => setDeleteDialogOpen(true),
+								Icon: DeleteForever,
+								disabled: !currentUserIsAdmin,
+							},
+						]}
 					/>
 				}>
 				{/* Status bar if applicable */}
@@ -714,29 +587,25 @@ const SerialNumberForm = ({
 
 						<TabbedSectionContent>
 							{tabValue === 'Notes' ? (
-								<CustomTable
-									formName='Note'
-									reportName='Notes'
-									defaultSortByColumn='Added_Time'
-									defaultCriteria={`Parent_ID=="${id}"`}
-									tabTable
-									parentId={id}
+								<NoteReport
+									variant='tab'
+									maxHeight={600}
+									forcedCriteria={`Parent_ID=="${id}"`}
+									loadData={{ Parent_ID: id }}
 								/>
 							) : tabValue === 'Emails' ? (
-								<CustomTable
-									formName='Email'
-									defaultSortByColumn='Added_Time'
-									defaultCriteria={`Parent_ID=="${id}"`}
-									tabTable
-									parentId={id}
+								<EmailReport
+									variant='tab'
+									maxHeight={600}
+									forcedCriteria={`Parent_ID=="${id}"`}
+									loadData={{ Parent_ID: id }}
 								/>
 							) : tabValue === 'Attachments' ? (
-								<CustomTable
-									formName='Attachment'
-									defaultSortByColumn='Added_Time'
-									defaultCriteria={`Parent_ID=="${id}"`}
-									tabTable
-									parentId={id}
+								<AttachmentReport
+									variant='tab'
+									maxHeight={600}
+									forcedCriteria={`Parent_ID=="${id}"`}
+									loadData={{ Parent_ID: id }}
 								/>
 							) : null}
 						</TabbedSectionContent>
@@ -780,6 +649,39 @@ const SerialNumberForm = ({
 			{/* Email Wizard) */}
 
 			{/* Print Wizard */}
+
+			{/* Search  */}
+			<RenderPopup
+				title={
+					<Box sx={{ display: 'flex' }}>
+						<DatabaseDefaultIcon form={'Serial_Number'} sx={{ mr: 0.75 }} />
+						<Typography component='span'>
+							Search Serial Number{' '}
+							<Typography component='span' sx={{ fontWeight: 'bold' }}>
+								{state.currentData.Value}
+							</Typography>
+						</Typography>
+					</Box>
+				}
+				open={searchOpen}
+				onClose={() => setSearchOpen(false)}>
+				<Box>
+					<Typography>Purchase Receive Line Items:</Typography>
+					<PurchaseReceiveLineItemReport
+						disableOpenOnRowClick
+						disableRowRightClick
+						variant='tab'
+						maxHeight={maxHeight}
+						forcedCriteria={`Serial_Number_Entry.contains("${state.currentData.Value}")`}
+						ActionProps={{
+							hideAdd: true,
+							hideEdit: true,
+							hideMassUpdate: true,
+							hideDelete: true,
+						}}
+					/>
+				</Box>
+			</RenderPopup>
 
 			{/* Toast messaging in lower right */}
 			<ToastMessage data={toastData} />

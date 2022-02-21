@@ -23,6 +23,7 @@ import InventoryAdjustmentLineItemForm from '../Forms/InventoryAdjustmentLineIte
 import ManufacturerForm from '../Forms/ManufacturerForm';
 import NoteForm from '../Forms/NoteForm';
 import OpportunityForm from '../Forms/OpportunityForm';
+import PortalUserForm from '../Forms/PortalUserForm';
 import PriorityForm from '../Forms/PriorityForm';
 import PurchaseOrderForm from '../Forms/PurchaseOrderForm';
 import PurchaseOrderLineItemForm from '../Forms/PurchaseOrderLineItemForm';
@@ -49,55 +50,12 @@ import VendorForm from '../Forms/VendorForm';
 //#region Wizards
 import ProductFillWizard from '../Wizards/ProductFillWizard';
 import PurchasingWizard from '../Wizards/PurchasingWizard';
+import { plurifyFormName } from './functions';
 
 //#endRegion
 
-const formTypeToReportMappings = {
-	Account: 'Accounts_Report',
-	Account_Industry: 'Account_Industries',
-	Contact: 'Contacts',
-	Contact_Profile: 'Contact_Profiles',
-	Customer_Asset: 'Customer_Assets',
-	Customer_Room: 'Customer_Rooms',
-	Demo: 'Demos',
-	Email: 'Emails',
-	Employee: 'Employees',
-	Estimate: 'Estimates',
-	Estimate_Line_Item: 'Estimate_Line_Items',
-	Expense: 'Expenses',
-	Inventory_Adjustment: 'Inventory_Adjustments',
-	Inventory_Adjustment_Line_Item: 'Inventory_Adjustment_Line_Items',
-	Lead: 'Leads',
-	Manufacturer: 'Manufacturers',
-	Note: 'Notes',
-	Opportunity: 'Opportunities',
-	Price_Book_Item: 'Price_Book_Items',
-	Priority: 'Priorities',
-	Project: 'Projects',
-	Purchase_Order: 'Purchase_Orders',
-	Purchase_Order_Line_Item: 'Purchase_Order_Line_Items',
-	Purchase_Receive: 'Purchase_Receives',
-	Purchase_Receive_Line_Item: 'Purchase_Order_Line_Items',
-	Quote: 'Quotes',
-	Quote_Line_Item: 'Quote_Line_Items',
-	RMA: 'RMAs',
-	Sales_Order: 'Sales_Orders',
-	Sales_Order_Line_Item: 'Sales_Order_Line_Items',
-	Serial_Number: 'Serial_Numbers',
-	Service_Contract: 'Service_Contracts',
-	Service_Order: 'Service_Orders',
-	Subcontractor: 'Subcontractors',
-	Subscription: 'Subscriptions',
-	Tag: 'Tags',
-	Task: 'Tasks',
-	Time_Entry: 'Time_Entries',
-	Vendor: 'Vendors',
-};
-
 const RenderForm = ({ id, formName, ...others }) => {
-	const reportName = formTypeToReportMappings[formName]
-		? formTypeToReportMappings[formName]
-		: '';
+	const reportName = formName === 'Account' ? 'Accounts_Report' : plurifyFormName(formName);
 
 	switch (formName) {
 		case 'Account':
@@ -243,6 +201,14 @@ const RenderForm = ({ id, formName, ...others }) => {
 					{...others}
 				/>
 			);
+		case 'Portal_User':
+			return (
+				<PortalUserForm
+					formName={formName}
+					resource={getRecordByIdSuspense(reportName, id)}
+					{...others}
+				/>
+			);
 		case 'Price_Book_Item':
 			return (
 				<PriceBookItemForm
@@ -251,6 +217,7 @@ const RenderForm = ({ id, formName, ...others }) => {
 					{...others}
 				/>
 			);
+
 		case 'Priority':
 			return (
 				<PriorityForm

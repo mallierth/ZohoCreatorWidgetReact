@@ -87,6 +87,7 @@ export const columns = [
 	},
 	{
 		field: 'Product',
+		searchField: ['Name', 'Code'],
 		flex: 5,
 		valueGetter: ({ row }) => getProductInfo(row),
 		renderCell: ({ row }) => getProductInfoRendered(row),
@@ -291,9 +292,11 @@ const QuoteLineItemReport = ({
 	variant,
 	onChange,
 	sortOrder,
+	...others
 }) => {
 	return (
 		<CustomDataTable
+			{...others}
 			hideFilterGraphic
 			formName='Quote_Line_Item'
 			height={maxHeight - 16}

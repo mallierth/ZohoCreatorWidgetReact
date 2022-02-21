@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useRecoilValue } from 'recoil';
 import { Box, Typography } from '@mui/material';
-import { GridActionsCellItem } from '@mui/x-data-grid';
 import DatabaseDefaultIcon from '../Helpers/DatabaseDefaultIcon';
 import CustomTable from '../CustomTable/CustomTable';
 import CustomDataTable from '../CustomDataTable/CustomDataTable';
@@ -44,6 +43,7 @@ export const columns = [
 		searchField: false,
 		type: 'dateTime',
 		flex: 2,
+		valueGetter: ({ value }) => value && new Date(value)
 	},
 	{
 		field: 'Report_End',
@@ -51,6 +51,7 @@ export const columns = [
 		searchField: false,
 		type: 'dateTime',
 		flex: 2,
+		valueGetter: ({ value }) => value && new Date(value)
 	},
 	{
 		field: 'Work_Performed',

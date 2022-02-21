@@ -89,7 +89,7 @@ const navWizards = [
   //"RMA_Processing",
 ].sort();
 
-const navAdmin = ["Quote_Line_Item", "Sales_Order_Line_Item"].sort();
+const navAdmin = ["Quote_Line_Item", "Sales_Order_Line_Item", 'Portal_User', 'Service_Request'].sort();
 
 const miniDrawerWidth = (theme) => {
   //theme?.spacing(n) returns a string with px

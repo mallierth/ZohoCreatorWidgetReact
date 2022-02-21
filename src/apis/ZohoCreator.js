@@ -1,7 +1,9 @@
 import { plurifyFormName } from '../components/Helpers/functions';
 import { formatFormData } from '../components/Helpers/CustomHooks';
+import axios from 'axios';
 
 export const appName = 'av-professional-services';
+export const accessTokenUrl = `https://accounts.zoho.com/oauth/v2/auth?response_type=code&client_id=1000.8O1B2E8IXMK9BZRRN0EGDPNQT601PJ&scope=ZohoCreator.form.CREATE,ZohoCreator.report.CREATE,ZohoCreator.report.READ,ZohoCreator.report.UPDATE,ZohoCreator.report.DELETE,ZohoCreator.meta.form.READ,ZohoCreator.meta.application.READ,ZohoCreator.dashboard.READ&redirect_uri=https://creatorapp.zoho.com/visionpointllc/av-professional-services-v2#Testing&access_type=offline`;
 
 export const getCurrentUser = async (account_id, isDashboard) => {
 	const databaseSettingsCreateRecord = await ZOHO.CREATOR.API.addRecord({
@@ -116,11 +118,11 @@ export const addRecord = async (formName, data, onSuccess) => {
 		formName,
 		data: { data: formattedData.data },
 	}).catch((err) => {
-    console.log('apis/ZohoCreator.js addRecord() err', err);
+		console.log('apis/ZohoCreator.js addRecord() err', err);
 		return err;
 	});
 
-  console.log('apis/ZohoCreator.js addRecord() response', response);
+	console.log('apis/ZohoCreator.js addRecord() response', response);
 
 	try {
 		if (response && response.code === 3000) {
@@ -130,8 +132,6 @@ export const addRecord = async (formName, data, onSuccess) => {
 				reportName: plurifyFormName(formName),
 				id: response.data.ID,
 			});
-
-			
 
 			return { ...data, ...addData.data, Added: true };
 		} else if (response && response.code === 3001) {
@@ -376,6 +376,73 @@ const wrapPromise = (promise) => {
 			}
 		},
 	};
+};
+
+//#endregion
+
+//#region //? Axios Wrappers
+
+const CLIENT_ID = `1000.8O1B2E8IXMK9BZRRN0EGDPNQT601PJ`;
+const CLIENT_SECRET = `40f6cc281382c0852ea006b8983094af38977a088c`;
+
+export const generateAccessToken = async (code) => {
+
+	/*
+		Navigate to this URL accessTokenUrl
+		User interacts from the browser, redirects to server URL
+		Using the code URL parameter, generate an access/refresh token tracked via a background service
+	*/
+
+	if(!code) {
+		throw new Error(
+			'Error within apis/ZohoCreator.js! A code was not provided to generateAccessToken()'
+		);
+	}
+
+	return await axios.post(
+		'https://accounts.zoho.com/oauth/v2/token',
+		{
+			grant_type: 'authorization_code',
+			client_id: CLIENT_ID,
+			client_secret: CLIENT_SECRET,
+			redirect_uri:
+				'https://creatorapp.zoho.com/visionpointllc/av-professional-services-v2#Testing',
+			code,
+		}
+	);
+};
+
+const zohoWidgetApi = axios.create({
+	baseURL:
+		'https://creator.zoho.com/api/v2/visionpointllc/av-professional-services/',
+	timeout: 1000,
+	headers: {
+		//Authorization: `Zoho-oauthtoken ${CLIENT_CODE}`,
+	},
+});
+
+export const axiosGetAllRecords = async ({
+	reportName,
+	criteria = '',
+	page = 1,
+	pageSize = 200,
+}) => {
+	//view/{reportName}}?criteria=Status%3D%3D%22Active%22%20%7C%7C%20Status%3D%3D%22Flagged%20for%20Removal%22&from=1&limit=200
+
+	if (!reportName) {
+		throw new Error(
+			'Error within apis/ZohoCreator.js! A report name was not provided to the axios wrapper getAllRecords()'
+		);
+	}
+
+	const response = await zohoWidgetApi.get(`report/${reportName}`, {
+		appName,
+		criteria: encodeURIComponent(criteria),
+		from: page,
+		limit: pageSize,
+	});
+
+	console.log('ZohoCreator.js axios getAllRecords() response', response);
 };
 
 //#endregion

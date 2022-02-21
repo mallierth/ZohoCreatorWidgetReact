@@ -24,6 +24,7 @@ import {
 	camelize,
 	intTryParse,
 	plurifyFormName,
+	sum,
 } from '../Helpers/functions';
 import {
 	AppBar,
@@ -52,10 +53,12 @@ import {
 	Typography,
 } from '@mui/material';
 import {
-	Block,
 	ConfirmationNumber,
 	DeleteForever,
+	Description,
 	Devices,
+	Inventory,
+	ShoppingCart,
 	VerifiedUser,
 } from '@mui/icons-material';
 import TabbedSectionHeader from '../TabbedSection/TabbedSectionHeader';
@@ -94,6 +97,7 @@ import { LoadingButton } from '@mui/lab';
 import ExpenseReport from '../Reports/ExpenseReport';
 import RmaReport from '../Reports/RmaReport';
 import TimeEntryReport from '../Reports/TimeEntryReport';
+import PurchaseOrderLineItemReport from '../Reports/PurchaseOrderLineItemReport';
 
 //#region //TODO Mass update fields available
 const massUpdateCapableFieldKeys = [
@@ -172,6 +176,10 @@ const ProjectForm = ({
 	const [timelineOpen, setTimelineOpen] = useState(false);
 	const [tabValue, setTabValue] = useState('Notes');
 	const [pickTicketDialogOpen, setPickTicketDialogOpen] = useState(false);
+	const [salesOrderLineItemDialogOpen, setSalesOrderLineItemDialogOpen] =
+		useState(false);
+	const [purchaseOrderLineItemDialogOpen, setPurchaseOrderLineItemDialogOpen] =
+		useState(false);
 	const [projectAuditDialogOpen, setProjectAuditDialogOpen] = useState(false);
 	const [customerAssetCreateDialogOpen, setCustomerAssetCreateDialogOpen] =
 		useState(false);
@@ -364,7 +372,7 @@ const ProjectForm = ({
 	//#region //! Commands exposed by Actions dropdown
 	const openFirstYearWarrantyInNewTab = () => {
 		setApplicationTabs((old) => [
-			...old,
+			...old.map((o) => ({ ...o, active: false })),
 			{
 				uuid: uuidv4(),
 				label:
@@ -373,6 +381,23 @@ const ProjectForm = ({
 				type: 'form',
 				id: state.currentData.First_Year_Warranty.ID,
 				name: 'Service_Contract',
+				active: true,
+			},
+		]);
+	};
+
+	const openSourceOpportunityInNewTab = () => {
+		setApplicationTabs((old) => [
+			...old.map((o) => ({ ...o, active: false })),
+			{
+				uuid: uuidv4(),
+				label:
+					'Opportunity: ' +
+					state?.currentData?.Source_Opportunity?.display_value,
+				type: 'form',
+				id: state.currentData.Source_Opportunity.ID,
+				name: 'Opportunity',
+				active: true,
 			},
 		]);
 	};
@@ -402,9 +427,28 @@ const ProjectForm = ({
 						options={[
 							{
 								type: 'form',
+								label: `Go to ${state?.currentData?.Source_Opportunity.display_value}`,
+								onClick: () => openSourceOpportunityInNewTab(),
+								hidden: !state?.currentData?.Source_Opportunity,
+								Icon: Description,
+							},
+							{
+								type: 'form',
 								label: 'Pick Ticket',
 								onClick: () => setPickTicketDialogOpen(true),
 								Icon: ConfirmationNumber,
+							},
+							{
+								type: 'form',
+								label: 'Sales Order Line Items',
+								onClick: () => setSalesOrderLineItemDialogOpen(true),
+								Icon: Inventory,
+							},
+							{
+								type: 'form',
+								label: 'Purchase Order Line Items',
+								onClick: () => setPurchaseOrderLineItemDialogOpen(true),
+								Icon: ShoppingCart,
 							},
 							{
 								type: 'form',
@@ -1145,16 +1189,115 @@ const ProjectForm = ({
 				}
 				open={pickTicketDialogOpen}
 				onClose={() => setPickTicketDialogOpen(false)}>
-				<ProjectPickTicketReport
+				<ProjectPickTicketReport maxHeight={maxHeight} variant='modal' />
+			</RenderPopup>
+
+			{/* Sales Order Line Items */}
+			<RenderPopup
+				title={
+					<Box sx={{ display: 'flex' }}>
+						<DatabaseDefaultIcon
+							form={'Sales_Order_Line_Item'}
+							sx={{ mr: 0.75 }}
+						/>
+						<Typography component='span'>
+							Sales Order Line Items for{' '}
+							<Typography component='span' sx={{ fontWeight: 'bold' }}>
+								{state?.currentData?.Name}
+							</Typography>
+						</Typography>
+					</Box>
+				}
+				open={salesOrderLineItemDialogOpen}
+				onClose={() => setSalesOrderLineItemDialogOpen(false)}>
+				<SalesOrderLineItemReport
+					includeStatus
+					disableOpenOnRowClick
+					disableRowRightClick
 					maxHeight={maxHeight}
-					referenceId={state?.currentData?.Reference?.ID}
-					phaseId={
-						state?.currentData?.Enable_Phases === 'true' ||
-						state?.currentData?.Enable_Phases === true
-							? state?.currentData?.ID
-							: null
-					}
+					forcedCriteria={`Sales_Order.Reference_ID==${
+						state.savedData.Reference ? state.savedData.Reference.ID : '0'
+					}${
+						state.savedData.Enable_Phases &&
+						state.savedData.Enable_Phases !== 'false'
+							? `&& Project.Phase==${id}`
+							: ''
+					} && Deleted == false && Sales_Order.Type=="Project Order" && Sales_Order.Void_field=false`}
 					variant='modal'
+					ActionProps={{
+						hideAdd: true,
+						hideEdit: true,
+						hideMassUpdate: true,
+						hideDelete: true,
+					}}
+					additionalColumns={[
+						{
+							field: 'Sales_Order.Status',
+							headerName: 'Sales Order Status',
+							flex: 2,
+						},
+						{
+							field: 'Quantity_Reserved',
+							headerName: 'Qty Filled',
+							type: 'number',
+							valueGetter: ({ row }) => {
+								if (Array.isArray(row.Quantity_Reserved)) {
+									return sum(row.Quantity_Reserved, 'display_value');
+								}
+
+								return 0;
+							},
+							flex: 0.5,
+						},
+					]}
+				/>
+			</RenderPopup>
+
+			{/* Purchase Order Line Items */}
+			<RenderPopup
+				title={
+					<Box sx={{ display: 'flex' }}>
+						<DatabaseDefaultIcon
+							form={'Purchase_Order_Line_Item'}
+							sx={{ mr: 0.75 }}
+						/>
+						<Typography component='span'>
+							Purchase Order Line Items for{' '}
+							<Typography component='span' sx={{ fontWeight: 'bold' }}>
+								{state?.currentData?.Name}
+							</Typography>
+						</Typography>
+					</Box>
+				}
+				open={purchaseOrderLineItemDialogOpen}
+				onClose={() => setPurchaseOrderLineItemDialogOpen(false)}>
+				<PurchaseOrderLineItemReport
+					includeStatus
+					disableOpenOnRowClick
+					disableRowRightClick
+					maxHeight={maxHeight}
+					forcedCriteria={`Purchase_Order.Reference_ID==${
+						state.savedData.Reference ? state.savedData.Reference.ID : '0'
+					}${
+						state.savedData.Enable_Phases &&
+						state.savedData.Enable_Phases !== 'false'
+							? `&& Project.Phase==${id}`
+							: ''
+					} && Deleted == false && Purchase_Order.Void_field=false`}
+					variant='modal'
+					ActionProps={{
+						hideAdd: true,
+						hideEdit: true,
+						hideMassUpdate: true,
+						hideDelete: true,
+					}}
+					additionalColumns={[
+						{
+							field: 'Purchase_Order.Status',
+							headerName: 'PO Status',
+							flex: 1,
+						},
+					]}
 				/>
 			</RenderPopup>
 

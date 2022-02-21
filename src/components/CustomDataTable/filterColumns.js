@@ -13,6 +13,7 @@ export { filterColumns as leadFilterColumns } from '../Reports/LeadReport';
 export { filterColumns as manufacturerFilterColumns } from '../Reports/ManufacturerReport';
 export { filterColumns as noteFilterColumns } from '../Reports/NoteReport';
 export { filterColumns as opportunityFilterColumns } from '../Reports/OpportunityReport';
+export { filterColumns as portalUserFilterColumns } from '../Reports/PortalUserReport';
 export { filterColumns as priceBookItemFilterColumns } from '../Reports/PriceBookItemReport';
 export { filterColumns as priorityFilterColumns } from '../Reports/PrioritiesKanban';
 export { filterColumns as projectFilterColumns } from '../Reports/ProjectReport';

@@ -78,6 +78,7 @@ import ContextCircularProgressLoader from '../Loaders/ContextCircularProgressLoa
 import { Context } from 'immutability-helper';
 import ModeSwitch from '../FormControls/ModeSwich';
 import { ColorPicker } from 'mui-color';
+import { axiosGetAllRecords } from '../../apis/ZohoCreator';
 
 //#region //TODO Mass update fields available
 const massUpdateCapableFieldKeys = [
@@ -955,7 +956,9 @@ const EmployeeForm = ({
 									control={
 										<Checkbox
 											checked={debug}
-											onChange={(e) => setDebug(e.target.checked)}
+											onChange={(e) => {
+												axiosGetAllRecords({reportName: 'Employees', criteria: 'Active==true'});
+											}}
 										/>
 									}
 									label='Debug'

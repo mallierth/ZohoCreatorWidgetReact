@@ -35,6 +35,7 @@ export const operators = (type, includeCurrentUser) => {
 				'current week',
 				'next week',
 				'age in days',
+				'n days old or more',
 				'due in days',
 				'is empty',
 				'is not empty',
@@ -85,6 +86,7 @@ export const operators = (type, includeCurrentUser) => {
 export const filterValueFieldRenderType = (type, operator) => {
 	switch (operator) {
 		case 'age in days':
+		case 'n days old or more':
 		case 'due in days':
 			return 'number';
 		default:
@@ -342,6 +344,11 @@ export const getCriteria = (
 				.format(dayJsFormat)}' && ${searchField} <= '${dayjs().format(
 				dayJsFormat
 			)}')`;
+		case 'n days old or more':
+			return `(${searchField} <= '${dayjs()
+				.subtract(value1, 'day')
+				.startOf('day')
+				.format(dayJsFormat)}')`;
 		case 'due in days':
 			return `(${searchField} >= '${dayjs().format(
 				dayJsFormat

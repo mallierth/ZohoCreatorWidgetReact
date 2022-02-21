@@ -77,9 +77,6 @@ import FileUploadField from '../FormControls/FileUploadField';
 const massUpdateCapableFieldKeys = [
 	{ label: 'Reference', value: 'Reference' },
 	{ label: 'Reason', value: 'Reason' },
-	{ label: 'Date', value: 'Date_field' },
-	{ label: 'Start Time', value: 'Start_Time' },
-	{ label: 'End Time', value: 'End_Time' },
 ];
 //#endregion
 
@@ -239,6 +236,7 @@ const TimeEntryForm = ({
 	loadData, //When adding a new form, this is the data object that can contain things like: {Account: '123456', Reference: '1234566'}
 	massUpdating, //Used to enable mass update mode
 	massUpdateRecordIds,
+	onMassUpdate,
 	uuid,
 	maxHeight,
 }) => {
@@ -412,7 +410,7 @@ const TimeEntryForm = ({
 
 	//! Manual Save
 	const onSave = () => {
-		if (isValid()) {
+		if (isValid() || massUpdating) {
 			if (debug) {
 				setToastData({
 					message: `DEBUG ENABLED: Save manually called with valid form data!`,
@@ -422,12 +420,18 @@ const TimeEntryForm = ({
 				if (id) {
 					updateRecord(plurifyFormName(formName), id, state.data);
 				} else if (massUpdating) {
+					//massUpdateFieldList is a list of keys to include in massUpdate
+
+					let _temp = {};
+					massUpdateFieldList.forEach(
+						(key) => (_temp[key] = state?.currentData[key])
+					);
 					massUpdateRecords(
 						plurifyFormName(formName),
 						massUpdateRecordIds,
-						{},
-						(response) => {
-							console.log('massUpdate response', response);
+						_temp,
+						() => {
+							onMassUpdate(_temp);
 						}
 					);
 				} else {
@@ -803,10 +807,12 @@ const TimeEntryForm = ({
 				}
 				onSave={onSave}
 				saveDisabled={
-					(state.data && Object.keys(state.data).length === 0) ||
-					Object.values(error).includes(true) ||
-					state.status === 'saving' ||
-					state.status === 'deleting'
+					massUpdating
+						? massUpdateFieldList.length === 0
+						: (state.data && Object.keys(state.data).length === 0) ||
+						  Object.values(error).includes(true) ||
+						  state.status === 'saving' ||
+						  state.status === 'deleting'
 				}
 				onReset={onReset}
 				resetDisabled={
@@ -845,6 +851,7 @@ TimeEntryForm.propTypes = {
 	onChange: PropTypes.func,
 	massUpdating: PropTypes.bool,
 	massUpdateRecordIds: PropTypes.array,
+	onMassUpdate: PropTypes.func,
 	uuid: PropTypes.string,
 	maxHeight: PropTypes.number,
 };

@@ -93,76 +93,110 @@ export const columns = [
 	},
 	{
 		field: 'Product',
+		searchField: ['Name', 'Code'],
 		flex: 5,
 		valueGetter: ({ row }) => getProductInfo(row),
 		renderCell: ({ row }) => getProductInfoRendered(row),
 	},
 	{
+		field: 'Description',
+		flex: 5,
+		hide: true,
+		enableExport: true,
+	},
+	{
 		field: 'Quantity',
 		type: 'number',
 		flex: 1,
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : value;
+		},
 	},
 	{
 		field: 'Cost',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ value }) => currency(value),
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : currency(value);
+		},
 	},
-	// {
-	// 	field: 'Cost_Subtotal',
-	// 	headerName: 'Cost Subtotal',
-	// 	type: 'number',
-	// 	flex: 1,
-	// 	valueFormatter: ({ value }) => currency(value),
-	// },
 	{
 		field: 'Cost_Total',
 		headerName: 'Cost Total',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ value }) => currency(value),
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : currency(value);
+		},
 	},
 	{
 		field: 'Sell_Price_Each',
 		headerName: 'Sell Price Each',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ value }) => currency(value),
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : currency(value);
+		},
 	},
-	// {
-	// 	field: 'Sell_Price_Subtotal',
-	// 	headerName: 'Sell Price Subtotal',
-	// 	type: 'number',
-	// 	flex: 1,
-	// 	valueFormatter: ({ value }) => currency(value),
-	// },
 	{
 		field: 'Sell_Price_Total',
 		headerName: 'Sell Price Total',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ value }) => currency(value),
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : currency(value);
+		},
 	},
-	// {
-	// 	field: 'Discount_Rate',
-	// 	headerName: 'Discount (%)',
-	// 	type: 'number',
-	// 	flex: 1,
-	// 	valueFormatter: ({ value }) => percent(value),
-	// },
-	// {
-	// 	field: 'Discount_Dollars',
-	// 	headerName: 'Discount ($)',
-	// 	type: 'number',
-	// 	flex: 1,
-	// 	valueFormatter: ({ value }) => currency(value),
-	// },
 	{
 		field: 'Margin',
 		headerName: 'Margin (%)',
 		type: 'number',
 		flex: 1,
-		valueFormatter: ({ value }) => percent(value),
+		valueFormatter: ({ api, id, value, row }) => {
+			//Workaround to still enable export for xlsx where api isn't defined
+			let _row;
+			if (row) {
+				_row = row;
+			} else {
+				_row = api.getRow(id);
+			}
+			return _row.Type === 'Comment' ? '' : percent(value);
+		},
 	},
 ];
 
@@ -237,10 +271,21 @@ const getProductInfo = (row) => {
 
 const getProductInfoRendered = (row) => {
 	let nameCode = row.Name === row.Code ? row.Name : `${row.Name} (${row.Code})`;
+
+	if (row.Type === 'Comment') {
+		return <Typography variant='body2'>{row.Description}</Typography>;
+	}
+
 	return (
-		<Box sx={{ display: 'grid', }}>
-			<Typography variant='body2' sx={{ fontWeight: 'bold' }}>{nameCode}</Typography>
-			<Typography variant='caption' sx={{ color: 'secondary', fontStyle: 'italic' }}>{row.Description}</Typography>
+		<Box sx={{ display: 'grid' }}>
+			<Typography variant='body2' sx={{ fontWeight: 'bold' }}>
+				{nameCode}
+			</Typography>
+			<Typography
+				variant='caption'
+				sx={{ color: 'secondary', fontStyle: 'italic' }}>
+				{row.Description}
+			</Typography>
 		</Box>
 	);
 };
@@ -252,9 +297,12 @@ const SalesOrderLineItemReport = ({
 	loadData,
 	variant,
 	onChange,
+	additionalColumns,
+	...others
 }) => {
 	return (
 		<CustomDataTable
+			{...others}
 			formName='Sales_Order_Line_Item'
 			height={maxHeight - 16}
 			forcedCriteria={forcedCriteria}
@@ -309,7 +357,7 @@ const SalesOrderLineItemReport = ({
 			WrapperProps={{
 				elevation: 4,
 			}}
-			columns={columns}
+			columns={[...columns, ...additionalColumns]}
 			filterColumns={filterColumns}
 			hideFilters={variant === 'tab'} //! add
 			hideSearch={variant === 'tab'} //! add
@@ -325,6 +373,11 @@ SalesOrderLineItemReport.propTypes = {
 	variant: PropTypes.oneOf(['tab']),
 	showActions: PropTypes.bool,
 	onChange: PropTypes.func,
+	additionalColumns: PropTypes.array,
+};
+
+SalesOrderLineItemReport.defaultProps = {
+	additionalColumns: [],
 };
 
 export default SalesOrderLineItemReport;

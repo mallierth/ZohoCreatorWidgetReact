@@ -81,12 +81,8 @@ const massUpdateCapableFieldKeys = [
 ];
 
 const defaultLoadData = {
-	Name: {
-		first_name: '',
-		last_name: '',
-	},
-	// 'Name.firstName': '',
-	// 'Name.lastName': '',
+	First_Name: '',
+	Last_Name: '',
 	Email: '',
 	Profile: '',
 	Type: '',

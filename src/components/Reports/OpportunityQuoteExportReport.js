@@ -93,7 +93,7 @@ export const columns = [
 	},
 	{
 		field: 'Product',
-		searchField: ['Code', 'Name', 'Description'],
+		searchField: ['Code', 'Name'],
 		flex: 5,
 		valueGetter: ({ row }) => getProductInfo(row),
 		renderCell: ({ row }) => getProductInfoRendered(row),

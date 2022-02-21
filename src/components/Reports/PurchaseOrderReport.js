@@ -53,6 +53,7 @@ export const columns = [
 		headerName: 'Date',
 		type: 'date',
 		flex: 2,
+		valueGetter: ({ value }) => value && new Date(value)
 	},
 	{
 		field: 'Buyer',
@@ -65,6 +66,13 @@ export const columns = [
 //? Add columns that will be used only for filtering
 export const filterColumns = [
 	...columns,
+	{
+		field: 'Added_Time',
+		headerName: 'Date Created',
+		type: 'dateTime',
+		flex: 2,
+		valueGetter: ({ value }) => value && new Date(value)
+	},
 	{
 		field: 'Comment',
 	},

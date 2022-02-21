@@ -82,7 +82,7 @@ import ConvertQuoteToSalesOrderDialog from '../Modals/ConvertQuoteToSalesOrderDi
 import RichTextField from '../RichText/RichTextField';
 import dayjs from 'dayjs';
 import QuoteLineItemReport from '../Reports/QuoteLineItemReport';
-import NoteReport from '../Reports/BillingEntityReport';
+import NoteReport from '../Reports/NoteReport';
 import EmailReport from '../Reports/EmailReport';
 import AttachmentReport from '../Reports/AttachmentReport';
 
@@ -498,13 +498,14 @@ const QuoteForm = ({
 			: state?.currentData?.Converted_to?.ID;
 
 		setApplicationTabs((old) => [
-			...old,
+			...old.map(o => ({...o, active: false})),
 			{
 				uuid: uuidv4(),
 				label: 'Sales Order: ' + label,
 				type: 'form',
 				id,
 				name: 'Sales_Order',
+				active: true,
 			},
 		]);
 	};
@@ -925,6 +926,8 @@ const QuoteForm = ({
 											display_value: state?.currentData?.Name,
 										},
 									}}
+									sortModel={JSON.parse(state?.currentData?.Line_Item_Order || [])}
+									onSortModelChange={(newModel) => mountData('Line_Item_Order', JSON.stringify(newModel || []))}
 								/>
 							) : tabValue === 'Notes' ? (
 								<NoteReport
