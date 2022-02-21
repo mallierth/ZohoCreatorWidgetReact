@@ -1015,7 +1015,7 @@ const CustomDataGrid = ({
 		e.preventDefault();
 		setContextMenu(
 			contextMenu === null
-				? { mouseX: event.clientX - 2, mouseY: event.clientY - 4 }
+				? { mouseX: e.clientX - 2, mouseY: e.clientY - 4 }
 				: null
 		);
 	};
@@ -1301,7 +1301,8 @@ const CustomDataGrid = ({
 								ActionProps.hideMassUpdate || selections.length === 0,
 							//Delete
 							onClickDelete,
-							disableDelete: !currentUserIsAdmin, //TODO open this up
+							disableDelete:
+								!currentUserIsAdmin && reportName !== 'Attachments', //TODO open this up
 							hideDelete: ActionProps.hideDelete || selections.length === 0,
 							//Export
 							onClickExport,
@@ -1561,6 +1562,7 @@ const CustomDataGrid = ({
 				</CustomDataGridOverlayDialog>
 			</Box>
 
+			{/* Row Record Rendering */}
 			<RenderPopup
 				maxWidth={rowDialogData?.mode === 'massUpdating' ? 800 : null}
 				open={rowDialogOpen}
