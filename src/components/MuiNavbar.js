@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { styled, useTheme } from '@mui/material/styles';
 import { AppBar, Box, Breadcrumbs, Container, Link } from '@mui/material';
@@ -21,7 +21,10 @@ import {
 	Palette,
 	Settings,
 } from '@mui/icons-material';
-import { autoHideNavigationState } from '../recoil/selectors';
+import {
+	autoHideNavigationState,
+	currentUserIsAdminState,
+} from '../recoil/selectors';
 import HelpDocs from './HelpDocs/HelpDocs';
 import {
 	appBreadcrumbState,
@@ -37,6 +40,7 @@ import RenderForm from './Helpers/RenderForm';
 import { focusPop } from './Helpers/animations';
 import ResponsiveDialog from './Modals/ResponsiveDialog';
 import { ToolbarTitle } from './CustomDataTable/CustomDataTable';
+import { getAllRecords } from '../apis/ZohoCreator';
 
 const sx = {
 	grow: { flexGrow: 1 },
@@ -44,6 +48,7 @@ const sx = {
 	sectionMobile: { display: { xs: 'flex', md: 'none' } },
 };
 
+const INTERVAL_DURATION = 1000 * 60 * 1; //1000ms * 60s/minute * n desired minutes (5 minutes)
 const drawerWidth = 240;
 
 const CustomToolbarWrapper = styled(Box, {
@@ -95,9 +100,49 @@ const MuiNavbar = ({ open, handleDrawerOpen, handleDrawerToggle }) => {
 	const [employeeSettingsModal, setEmployeeSettingsModal] = useState(false);
 	const [helpDocsModal, setHelpDocsModal] = useState(false);
 	const currentUser = useRecoilValue(currentUserState);
+	const currentUserIsAdmin = useRecoilValue(currentUserIsAdminState);
 	const formMaxWidth = useRecoilValue(formMaxWidthState);
 	const appMaxWidth = useRecoilValue(appMaxWidthState);
 	const sideNavEnabled = useRecoilValue(sideNavEnabledState);
+	const [notifications, setNotifications] = useState([]);
+	const notificationCount =
+		notifications.length > 0
+			? notifications.filter(
+					(notification) =>
+						!notification.Seen_By ||
+						!notification.Seen_By.map((x) => x.ID).includes(currentUser.ID)
+			  ).length
+			: 0;
+
+	useEffect(() => {
+		(async () => {
+			const response = await getAllRecords(
+				'Notifications',
+				`(!Hidden_By.contains(${currentUser.ID}) || Hidden_By == "" || Hidden_By == null) && ${currentUser.Subscribed_Notification_Groups.map(group => `Group.contains("${group}")`).join(' || ')}` //!Hidden_By.contains(${currentUser.ID}) && 
+			);
+			if(response.data) {
+				setNotifications(response.data);
+			}
+			console.log('Notifications:', response);
+		})();
+	}, []);
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			(async () => {
+				const response = await getAllRecords(
+					'Notifications',
+					`(!Hidden_By.contains(${currentUser.ID}) || Hidden_By == "" || Hidden_By == null) && ${currentUser.Subscribed_Notification_Groups.map(group => `Group.contains("${group}")`).join(' || ')}` //
+				);
+				if(response.data) {
+					setNotifications(response.data);
+				}
+				console.log('Notifications:', response);
+			})();
+		}, INTERVAL_DURATION);
+
+		return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+	}, []);
 
 	const handleMobileMenuClose = () => {
 		setMobileMoreAnchorEl(null);
@@ -120,15 +165,17 @@ const MuiNavbar = ({ open, handleDrawerOpen, handleDrawerToggle }) => {
 					<AddComment />
 				</IconButton>
 				<Typography>Internal Feedback</Typography>
-			</MenuItem>
-			<MenuItem>
-				<IconButton color='inherit' sx={{ pr: 2 }} size='large'>
-					<Badge badgeContent={11} color='secondary'>
-						<Notifications />
-					</Badge>
-				</IconButton>
-				<Typography>Notifications</Typography>
 			</MenuItem> */}
+			{currentUserIsAdmin ? (
+				<MenuItem>
+					<IconButton color='inherit' sx={{ pr: 2 }} size='large'>
+						<Badge badgeContent={notificationCount} color='error'>
+							<Notifications />
+						</Badge>
+					</IconButton>
+					<Typography>Notifications</Typography>
+				</MenuItem>
+			) : null}
 			<MenuItem onClick={(e) => setHelpDocsModal(true)}>
 				<IconButton color='inherit' sx={{ pr: 2 }} size='large'>
 					<Help />
@@ -170,7 +217,7 @@ const MuiNavbar = ({ open, handleDrawerOpen, handleDrawerToggle }) => {
 							) : null}
 							<CustomToolbarWrapper
 								open={open}
-								sx={{ display: 'flex', flex: 'auto', alignItems: 'center', }}
+								sx={{ display: 'flex', flex: 'auto', alignItems: 'center' }}
 								autoHideNavigation={autoHideNavigation}>
 								{/* <Box
 									component='img'
@@ -178,7 +225,9 @@ const MuiNavbar = ({ open, handleDrawerOpen, handleDrawerToggle }) => {
 									sx={{ maxHeight: navBarHeight }}
 								/> */}
 
-								<Typography variant="button">AV Professional Services</Typography>
+								<Typography variant='button'>
+									AV Professional Services
+								</Typography>
 
 								<Box sx={{ flexGrow: 1 }} />
 
@@ -193,17 +242,19 @@ const MuiNavbar = ({ open, handleDrawerOpen, handleDrawerToggle }) => {
 												<AddComment />
 											</IconButton>
 										</Slide> */}
-										{/* <Slide
-											in
-											direction='down'
-											style={{ transitionDelay: '600ms' }}
-											timeout={400}>
-											<IconButton color='inherit' size='large'>
-												<Badge badgeContent={17} color='secondary'>
-													<Notifications />
-												</Badge>
-											</IconButton>
-										</Slide> */}
+										{currentUserIsAdmin ? (
+											<Slide
+												in
+												direction='down'
+												style={{ transitionDelay: '600ms' }}
+												timeout={400}>
+												<IconButton color='inherit' size='large'>
+													<Badge badgeContent={notificationCount} color='error'>
+														<Notifications />
+													</Badge>
+												</IconButton>
+											</Slide>
+										) : null}
 
 										<Slide
 											in
