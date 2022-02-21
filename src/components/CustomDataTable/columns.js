@@ -13,6 +13,7 @@ export { columns as leadColumns } from '../Reports/LeadReport';
 export { columns as manufacturerColumns } from '../Reports/ManufacturerReport';
 export { columns as noteColumns } from '../Reports/NoteReport';
 export { columns as opportunityColumns } from '../Reports/OpportunityReport';
+export { columns as portalUserColumns } from '../Reports/PortalUserReport';
 export { columns as priceBookItemColumns } from '../Reports/PriceBookItemReport';
 export { columns as priorityColumns } from '../Reports/PrioritiesKanban';
 export { columns as projectColumns } from '../Reports/ProjectReport';
