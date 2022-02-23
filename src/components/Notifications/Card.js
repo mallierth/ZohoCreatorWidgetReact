@@ -1,22 +1,22 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
-import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
-import Collapse from '@mui/material/Collapse';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import { red } from '@mui/material/colors';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import ShareIcon from '@mui/icons-material/Share';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Button, Tooltip } from '@mui/material';
-import { Check, VisibilityOff } from '@mui/icons-material';
+import { Box, Button, Divider, Tooltip } from '@mui/material';
+import { omit } from 'lodash-es';
+import {
+	MarkEmailRead,
+	MarkEmailUnread,
+	PriorityHigh,
+	Update,
+	VisibilityOff,
+} from '@mui/icons-material';
 
 function stringToColor(string) {
 	let hash = 0;
@@ -54,16 +54,28 @@ const NotificationCard = ({
 	subtitle,
 	content,
 	timestamp,
+	timestampTooltip,
 	read,
 	onRead,
 	onHide,
+	variant,
+	highImportance,
+
+	applicationTabData,
+	onAction,
 }) => {
 	//! High importance
 
 	//! read graphic - overlay to dim
 
 	return (
-		<Card sx={{ maxWidth: 345, opacity: read ? 0.5 : 1 }}>
+		<Card
+			sx={{
+				opacity: read ? 0.5 : 1,
+				m: 1,
+				border: variant ? 1 : 0,
+				borderColor: variant ? `${variant}.main` : null,
+			}}>
 			<CardHeader
 				avatar={
 					<Tooltip title={author} arrow>
@@ -71,9 +83,13 @@ const NotificationCard = ({
 					</Tooltip>
 				}
 				action={
-					<IconButton aria-label='settings'>
-						<MoreVertIcon />
-					</IconButton>
+					<>
+						{highImportance ? (
+							<IconButton>
+								<PriorityHigh sx={{ color: 'error.main' }} />
+							</IconButton>
+						) : null}
+					</>
 				}
 				title={title}
 				subheader={subtitle}
@@ -82,16 +98,53 @@ const NotificationCard = ({
 				<Typography variant='body2' color='text.secondary'>
 					{content}
 				</Typography>
+				{applicationTabData && Array.isArray(applicationTabData)
+					? applicationTabData.map((tab) => (
+							<Box
+								key={tab.label}
+								sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+								<Button onClick={() => onAction(omit(tab, 'actionText'))}>
+									{tab.actionText}
+								</Button>
+							</Box>
+					  ))
+					: null}
 			</CardContent>
+			<Divider variant='middle' />
+			<Box
+				sx={{
+					py: 1,
+					px: 2,
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between',
+				}}>
+				<Tooltip title={timestampTooltip}>
+					<Typography
+						variant='caption'
+						sx={{
+							color: 'text.secondary',
+							display: 'flex',
+							alignItems: 'center',
+						}}>
+						<Update sx={{ mr: 0.5 }} />
+						{timestamp}
+					</Typography>
+				</Tooltip>
 
-			<CardActions>
-				<Button size='small' endIcon={<Check />} onClick={onRead}>
-					Mark as Read
-				</Button>
-				<Button size='small' endIcon={<VisibilityOff />} onClick={onHide}>
-					Dismiss
-				</Button>
-			</CardActions>
+				<CardActions sx={{ p: 0 }}>
+					<Tooltip title={`Mark as ${read ? 'Unread' : 'Read'}`}>
+						<IconButton size='small' onClick={onRead}>
+							{read ? <MarkEmailUnread /> : <MarkEmailRead />}
+						</IconButton>
+					</Tooltip>
+					<Tooltip title='Dismiss'>
+						<IconButton size='small' onClick={onHide}>
+							<VisibilityOff />
+						</IconButton>
+					</Tooltip>
+				</CardActions>
+			</Box>
 		</Card>
 	);
 };
@@ -99,13 +152,18 @@ const NotificationCard = ({
 NotificationCard.propTypes = {
 	author: PropTypes.string,
 	title: PropTypes.string,
-	subtitle: PropTypes.string,
+	subtitle: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
 	content: PropTypes.string,
-	timestamp: PropTypes.string,
-    onRead: PropTypes.func,
-    onHide: PropTypes.func,
-    read: PropTypes.bool,
+	timestamp: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+	timestampTooltip: PropTypes.string,
+	onRead: PropTypes.func,
+	onHide: PropTypes.func,
+	read: PropTypes.bool,
+	variant: PropTypes.oneOf(['info', 'error', 'success', 'warning', null]),
+	highImportance: PropTypes.bool,
 
+	applicationTabData: PropTypes.oneOfType([PropTypes.array, PropTypes.string, ]),
+	onAction: PropTypes.func,
 };
 
 export default NotificationCard;

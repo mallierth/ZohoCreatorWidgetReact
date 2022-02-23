@@ -4,6 +4,7 @@ import axios from 'axios';
 
 export const appName = 'av-professional-services';
 export const accessTokenUrl = `https://accounts.zoho.com/oauth/v2/auth?response_type=code&client_id=1000.8O1B2E8IXMK9BZRRN0EGDPNQT601PJ&scope=ZohoCreator.form.CREATE,ZohoCreator.report.CREATE,ZohoCreator.report.READ,ZohoCreator.report.UPDATE,ZohoCreator.report.DELETE,ZohoCreator.meta.form.READ,ZohoCreator.meta.application.READ,ZohoCreator.dashboard.READ&redirect_uri=https://creatorapp.zoho.com/visionpointllc/av-professional-services-v2#Testing&access_type=offline`;
+export const code = `1000.e3657c0291bffaeb7e81eb619f0b8792.cb8d2366fc79c9f5cb8bf752df0ecde5`;
 
 export const getCurrentUser = async (account_id, isDashboard) => {
 	const databaseSettingsCreateRecord = await ZOHO.CREATOR.API.addRecord({
@@ -257,7 +258,6 @@ export const getAllRecords = async (
 		);
 		console.log('ZohoCreator.js getAllRecords response', response);
 		if (response && response.code === 3000) {
-			
 			returnArr = [
 				...returnArr,
 				...response.data.map((data) => ({
@@ -384,32 +384,29 @@ const wrapPromise = (promise) => {
 
 const CLIENT_ID = `1000.8O1B2E8IXMK9BZRRN0EGDPNQT601PJ`;
 const CLIENT_SECRET = `40f6cc281382c0852ea006b8983094af38977a088c`;
+const CLIENT_CODE = `1000.e3657c0291bffaeb7e81eb619f0b8792.cb8d2366fc79c9f5cb8bf752df0ecde5`;
 
 export const generateAccessToken = async (code) => {
-
 	/*
 		Navigate to this URL accessTokenUrl
 		User interacts from the browser, redirects to server URL
 		Using the code URL parameter, generate an access/refresh token tracked via a background service
 	*/
 
-	if(!code) {
+	if (!code) {
 		throw new Error(
 			'Error within apis/ZohoCreator.js! A code was not provided to generateAccessToken()'
 		);
 	}
 
-	return await axios.post(
-		'https://accounts.zoho.com/oauth/v2/token',
-		{
-			grant_type: 'authorization_code',
-			client_id: CLIENT_ID,
-			client_secret: CLIENT_SECRET,
-			redirect_uri:
-				'https://creatorapp.zoho.com/visionpointllc/av-professional-services-v2#Testing',
-			code,
-		}
-	);
+	return await axios.post('https://accounts.zoho.com/oauth/v2/token', {
+		grant_type: 'authorization_code',
+		client_id: CLIENT_ID,
+		client_secret: CLIENT_SECRET,
+		redirect_uri:
+			'https://creatorapp.zoho.com/visionpointllc/av-professional-services-v2#Testing',
+		code,
+	});
 };
 
 const zohoWidgetApi = axios.create({
@@ -417,7 +414,7 @@ const zohoWidgetApi = axios.create({
 		'https://creator.zoho.com/api/v2/visionpointllc/av-professional-services/',
 	timeout: 1000,
 	headers: {
-		//Authorization: `Zoho-oauthtoken ${CLIENT_CODE}`,
+		Authorization: `Zoho-oauthtoken ${CLIENT_CODE}`,
 	},
 });
 

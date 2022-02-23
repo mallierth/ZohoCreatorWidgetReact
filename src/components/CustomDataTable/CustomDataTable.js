@@ -8,7 +8,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import ThemeCard from '../ThemeCard';
 import { applicationTabsState, currentUserState } from '../../recoil/atoms';
 import DatabaseDefaultIcon from '../Helpers/DatabaseDefaultIcon';
-import { DataGridPro, GridOverlay } from '@mui/x-data-grid-pro';
+import { DataGridPro, GridOverlay, useGridApiRef } from '@mui/x-data-grid-pro';
 import { plurifyFormName, getNameFn, intTryParse } from '../Helpers/functions';
 import {
 	Box,
@@ -427,7 +427,7 @@ const CustomDataGrid = ({
 	//#endregion
 }) => {
 	//#region //* Declarations
-
+	const apiRef = useGridApiRef();
 	const [adjustedHeight, setAdjustedHeight] = useState(0);
 	const [toastData, setToastData] = useState({});
 	const theme = useTheme();
@@ -518,29 +518,18 @@ const CustomDataGrid = ({
 
 	//? Upon row change, raise onSortModelChange if defined
 	useEffect(() => {
-		if (sortModel) {
-			console.log('CustomDataTable.js props.sortModel', sortModel);
-			console.log('CustomDataTable.js _sortModel', _sortModel);
-		}
-	}, [sortModel]);
-
-	useEffect(() => {
 		let newRows = [];
+
 		if (_sortModel) {
 			newRows = sortBySortModel(rows);
 		}
 
-		if (onSortModelChange) {
+		console.log('_sortModel changed', _sortModel);
+
+		if (onSortModelChange && newRows) {
 			if (
 				JSON.stringify(sortModel || []) !==
-				JSON.stringify(
-					newRows.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
-						.length > 0
-						? newRows
-								.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
-								.map((row) => row.id)
-						: []
-				)
+				JSON.stringify(newRows.length > 0 ? newRows.map((row) => row.id) : [])
 			) {
 				onSortModelChange(_sortModel);
 			}
@@ -549,20 +538,36 @@ const CustomDataGrid = ({
 
 	const sortBySortModel = (rows) => {
 		const _rows = Array.from(rows);
-		const newRows = _rows
-			.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
-			.sort((a, b) => {
-				return _sortModel.indexOf(a.id) > _sortModel.indexOf(b.id)
-					? 1
-					: _sortModel.indexOf(a.id) < _sortModel.indexOf(b.id)
-					? -1
-					: 0;
-			});
-		setRows([
-			...newRows,
-			..._rows.filter((row) => row.hierarchy && row.hierarchy.length > 1),
-		]);
+
+		let newRows = _rows.sort((a, b) => {
+			return _sortModel.indexOf(a.id) > _sortModel.indexOf(b.id)
+				? 1
+				: _sortModel.indexOf(a.id) < _sortModel.indexOf(b.id)
+				? -1
+				: 0;
+		});
+
+		setRows(newRows);
 		return newRows;
+	};
+
+	const cleanSortModel = (rows) => {
+		let _sortModel = rows
+			.filter((row) => !row.hierarchy || row.hierarchy.length === 1)
+			.map((row) => row.id); //! Only contains parent IDs
+		let children = rows.filter(
+			(row) => row.hierarchy && row.hierarchy.length > 1
+		); //! Only contains child rows
+		let final = [];
+		_sortModel.forEach((parentId) => {
+			final.push(parentId);
+			if (children.filter((x) => x.hierarchy.includes(parentId)).length > 0) {
+				children
+					.filter((x) => x.hierarchy.includes(parentId))
+					.forEach((child) => final.push(child.ID));
+			}
+		});
+		return final;
 	};
 
 	// Loading status
@@ -1237,13 +1242,14 @@ const CustomDataGrid = ({
 									}
 								});
 								//setRows(result);
-								setSortModel(
-									result
-										.filter(
-											(row) => !row.hierarchy || row.hierarchy.length === 1
-										)
-										.map((row) => row.id)
-								);
+								setSortModel(cleanSortModel(result));
+								// setSortModel(
+								// 	result
+								// 		.filter(
+								// 			(row) => !row.hierarchy || row.hierarchy.length === 1
+								// 		)
+								// 		.map((row) => row.id)
+								// );
 							},
 							disableShiftUp:
 								RowShiftControlProps.disableShiftUp || selections.length === 0,
@@ -1261,13 +1267,14 @@ const CustomDataGrid = ({
 									}
 								});
 								//setRows(result);
-								setSortModel(
-									result
-										.filter(
-											(row) => !row.hierarchy || row.hierarchy.length === 1
-										)
-										.map((row) => row.id)
-								);
+								setSortModel(cleanSortModel(result));
+								// setSortModel(
+								// 	result
+								// 		.filter(
+								// 			(row) => !row.hierarchy || row.hierarchy.length === 1
+								// 		)
+								// 		.map((row) => row.id)
+								// );
 							},
 							disableShiftDown:
 								RowShiftControlProps.disableShiftDown ||
@@ -1286,13 +1293,14 @@ const CustomDataGrid = ({
 									}
 								});
 								//setRows(result);
-								setSortModel(
-									result
-										.filter(
-											(row) => !row.hierarchy || row.hierarchy.length === 1
-										)
-										.map((row) => row.id)
-								);
+								setSortModel(cleanSortModel(result));
+								// setSortModel(
+								// 	result
+								// 		.filter(
+								// 			(row) => !row.hierarchy || row.hierarchy.length === 1
+								// 		)
+								// 		.map((row) => row.id)
+								// );
 							},
 							disableShiftBottom:
 								RowShiftControlProps.disableShiftBottom ||
@@ -1313,13 +1321,14 @@ const CustomDataGrid = ({
 									}
 								});
 								//setRows(result);
-								setSortModel(
-									result
-										.filter(
-											(row) => !row.hierarchy || row.hierarchy.length === 1
-										)
-										.map((row) => row.id)
-								);
+								setSortModel(cleanSortModel(result));
+								// setSortModel(
+								// 	result
+								// 		.filter(
+								// 			(row) => !row.hierarchy || row.hierarchy.length === 1
+								// 		)
+								// 		.map((row) => row.id)
+								// );
 							},
 						}}
 						ActionProps={{
@@ -1502,6 +1511,7 @@ const CustomDataGrid = ({
 					}}
 					{...omit(WrapperProps, 'sx')}>
 					<DataGridPro
+						apiRef={apiRef}
 						{...omit(DataGridProps, ['sx', 'componentsProps'])}
 						sx={{
 							'&.MuiDataGrid-root .MuiDataGrid-cell:focus': {
@@ -1573,6 +1583,9 @@ const CustomDataGrid = ({
 						loading={loading}
 						rows={rows}
 						rowHeight={DataGridProps?.rowHeight ? DataGridProps?.rowHeight : 30}
+						headerHeight={
+							DataGridProps?.headerHeight ? DataGridProps?.headerHeight : 30
+						}
 						columns={
 							mobileMode
 								? columns

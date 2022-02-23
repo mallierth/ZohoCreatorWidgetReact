@@ -7,7 +7,9 @@ import App from './components/App.js';
 import Loader from './components/Loader.js';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorGraphic from './components/ErrorBoundary/ErrorGraphic.js';
-
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en.json'
+TimeAgo.addDefaultLocale(en)
 // const onError = (error, errorInfo) => {
 // 	console.log('Error!', error, errorInfo);
 // };

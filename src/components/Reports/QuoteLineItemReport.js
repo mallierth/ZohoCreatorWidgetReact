@@ -230,6 +230,8 @@ export const filterColumns = [
 const CustomFooter = ({ rows }) => {
 	const total = sum(rows, 'Total');
 
+	console.log('rows', rows);
+
 	return (
 		<Box
 			sx={{
@@ -347,6 +349,7 @@ const QuoteLineItemReport = ({
 				components: {
 					Footer: CustomFooter,
 				},
+				onColumnWidthChange: ({ colDef, element, width }, e, api) => console.log('onColumnWidthChange() field', colDef.field, 'width', width),
 			}}
 			SearchProps={{
 				hidden: true,

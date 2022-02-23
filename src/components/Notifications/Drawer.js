@@ -16,12 +16,8 @@ const NotificationsDrawer = ({ open, onClose, children }) => {
 
 	return (
 		<Drawer anchor={'right'} open={open} onClose={onClose}>
-			<Box
-				sx={{ width: 400 }}
-				role='presentation'
-				onClick={toggleDrawer}
-				onKeyDown={toggleDrawer}>
-				<Stack spacing={2}>{children}</Stack>
+			<Box sx={{ width: 400 }} role='presentation'>
+				{children}
 			</Box>
 		</Drawer>
 	);
