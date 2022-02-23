@@ -7,9 +7,9 @@ import App from './components/App.js';
 import Loader from './components/Loader.js';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorGraphic from './components/ErrorBoundary/ErrorGraphic.js';
-import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en.json'
-TimeAgo.addDefaultLocale(en)
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en.json';
+TimeAgo.addDefaultLocale(en);
 // const onError = (error, errorInfo) => {
 // 	console.log('Error!', error, errorInfo);
 // };
@@ -26,13 +26,12 @@ if (_uriArr[_uriArr.length - 1].includes('creatorapp.zoho.com')) {
 	console.log('Other mode: ', _uriArr[_uriArr.length - 1]);
 }
 
-
 ReactDOM.render(
 	<RecoilRoot>
 		<React.Suspense fallback={<Loader show />}>
 			<DndProvider backend={HTML5Backend}>
 				<ErrorBoundary FallbackComponent={ErrorGraphic}>
-					{mode === 'widget' ? <App /> : <div>Client Portal</div>}
+					<App />
 				</ErrorBoundary>
 			</DndProvider>
 		</React.Suspense>
