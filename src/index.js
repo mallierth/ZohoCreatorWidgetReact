@@ -20,11 +20,9 @@ const _uriArr = window.location.href.split('/');
 let mode = '';
 if (_uriArr[_uriArr.length - 1].includes('creatorapp.zoho.com')) {
 	mode = 'widget';
-} else if (_uriArr[_uriArr.length - 1].includes('zohocreatorportal.com')) {
-	mode = 'portal';
 } else {
-	console.log('Other mode: ', _uriArr[_uriArr.length - 1]);
-}
+	mode = 'rest';
+} 
 
 ReactDOM.render(
 	<RecoilRoot>
