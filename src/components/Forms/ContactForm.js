@@ -73,7 +73,7 @@ import AttachmentReport from '../Reports/AttachmentReport';
 
 //#region //TODO Mass update fields available
 const massUpdateCapableFieldKeys = [
-	{ label: 'Account', value: 'Account' },
+	{ label: 'Accounts', value: 'Accounts' },
 	{ label: 'Subcontractor', value: 'Subcontractor' },
 	{ label: 'Vendor', value: 'Vendor' },
 	{ label: 'Type', value: 'Type' },
@@ -86,7 +86,7 @@ const defaultLoadData = {
 	Email: '',
 	Profile: '',
 	Type: '',
-	Account: '',
+	Accounts: '',
 	Subcontractor: '',
 	Vendor: '',
 	Direct_Phone: '',
@@ -658,7 +658,7 @@ const ContactForm = ({
 											mountData('Vendor', e);
 											if (e) {
 												mountData('Subcontractor', '');
-												mountData('Account', '');
+												mountData('Accounts', '');
 											}
 										}}
 										endAdornment={
@@ -684,7 +684,7 @@ const ContactForm = ({
 											mountData('Subcontractor', e);
 											if (e) {
 												mountData('Vendor', '');
-												mountData('Account', '');
+												mountData('Accounts', '');
 											}
 										}}
 										endAdornment={
@@ -698,16 +698,18 @@ const ContactForm = ({
 								<GridInputWrapper
 									massUpdating={massUpdating}
 									hidden={
-										massUpdating && !massUpdateFieldList.includes('Account')
+										massUpdating && !massUpdateFieldList.includes('Accounts')
 									}>
 									<LookupField2
-										name='Account'
-										label='Account'
+										name='Accounts'
+										label='Accounts'
 										defaultSortByColumn='Name'
+										formName='Account'
 										reportName='Accounts_Report'
-										defaultValue={state.currentData.Account}
+										defaultValue={state.currentData.Accounts}
+										multiSelect
 										onChange={(e) => {
-											mountData('Account', e);
+											mountData('Accounts', e);
 											if (e) {
 												mountData('Vendor', '');
 												mountData('Subcontractor', '');

@@ -88,6 +88,7 @@ import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 const filter = createFilterOptions();
 import { LoadingButton } from '@mui/lab';
 import { addRecord as rawAddRecord } from '../../apis/ZohoCreator';
+import ContactReport from '../Reports/ContactReport';
 
 //#region //TODO Mass update fields available
 const massUpdateCapableFieldKeys = [];
@@ -95,6 +96,10 @@ const massUpdateCapableFieldKeys = [];
 
 //#region //TODO Helper functions
 const parseForContactData = (data) => {
+	if (data?.Contact_Criteria) {
+		return data?.Contact_Criteria;
+	}
+
 	if (data?.Contact) {
 		return typeof data.Contact === 'object'
 			? `ID==${data.Contact.ID}`
@@ -337,7 +342,7 @@ const EmailForm = ({
 	const [contactsCcModalOpen, setContactsCcModalOpen] = useState(false);
 	const [toDropdownOpen, setToDropdownOpen] = useState(false);
 	const [selectedContacts, setSelectedContacts] = useState(loadData.To || []);
-	const [customInputContacts, setCustomInputContacts] = useState([]);
+	const [customInputContacts, setCustomInputContacts] = useState(data.To && Array.isArray(data.To) ? data.To : []);
 	const [selectedCcContacts, setSelectedCcContacts] = useState([]);
 	const [customInputCcContacts, setCustomInputCcContacts] = useState([]);
 	const [templateFetching, setTemplateFetching] = useState(false);
@@ -1058,18 +1063,12 @@ const EmailForm = ({
 				}
 				moveableModal>
 				<>
-					<Paper elevation={3} sx={{ backgroundColor: 'background.default' }}>
-						<CustomTable
-							tabTable
-							enableSearch
-							formName={'Contact'}
-							reportName={'Contacts'}
-							defaultValue={selectedContacts}
-							enableClickToSelect
-							defaultSortByColumn={'Full_Name'}
-							onChange={(selections) => setSelectedContacts(selections)}
-						/>
-					</Paper>
+					<ContactReport
+						maxHeight={600}
+						defaultSelections={selectedContacts}
+						disableOpenOnRowClick
+						onChange={(selections) => setSelectedContacts(selections)}
+					/>
 					<AppBar color='inherit' position='relative'>
 						<Container
 							maxWidth='xl'
@@ -1120,18 +1119,13 @@ const EmailForm = ({
 				}
 				moveableModal>
 				<>
-					<Paper elevation={3} sx={{ backgroundColor: 'background.default' }}>
-						<CustomTable
-							tabTable
-							enableSearch
-							formName={'Contact'}
-							reportName={'Contacts'}
-							defaultValue={selectedCcContacts}
-							enableClickToSelect
-							defaultSortByColumn={'Full_Name'}
-							onChange={(selections) => setSelectedCcContacts(selections)}
-						/>
-					</Paper>
+					<ContactReport
+						maxHeight={600}
+						defaultSelections={selectedCcContacts}
+						disableOpenOnRowClick
+						onChange={(selections) => setSelectedCcContacts(selections)}
+					/>
+
 					<AppBar color='inherit' position='relative'>
 						<Container
 							maxWidth='xl'

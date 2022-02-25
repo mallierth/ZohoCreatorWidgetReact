@@ -18,14 +18,13 @@ export const columns = [
 		flex: 4,
 	},
 	{
-		field: 'Description',
-		flex: 3,
+		field: 'Drawings_Name',
+		headerName: 'Alt Name',
+		flex: 4,
 	},
 	{
-		field: 'Account',
-		searchField: 'Account_Name',
+		field: 'Description',
 		flex: 3,
-		valueGetter: ({ value }) => value.display_value || '',
 	},
 	{
 		field: 'Account',

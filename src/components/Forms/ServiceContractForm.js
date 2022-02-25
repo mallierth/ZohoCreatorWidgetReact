@@ -832,6 +832,7 @@ const ServiceContractForm = ({
 									defaultSortByColumn='First_Name'
 									reportName='Contacts'
 									defaultValue={state.currentData.Contact}
+									defaultCriteria={state.currentData.Accounts ? state.currentData.Accounts.map(x => `Accounts.contains(${x.ID})`).join(' || ') : ''}
 									onChange={(e) => mountData('Contact', e)}
 									endAdornment={
 										<IconButton edge='end' size='large'>

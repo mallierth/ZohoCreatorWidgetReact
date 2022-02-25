@@ -860,13 +860,14 @@ const PriceBookItemForm = ({
 									</Grid>
 								</ThemeCard>
 							</GridInputWrapper>
-							<GridInputWrapper
-								massUpdating={massUpdating}
-								hidden={
-									massUpdating &&
-									!massUpdateFieldList.includes('Services Information')
-								}>
-								{state.currentData.Type === 'Service' ? (
+
+							{state.currentData.Type === 'Service' ? (
+								<GridInputWrapper
+									massUpdating={massUpdating}
+									hidden={
+										massUpdating &&
+										!massUpdateFieldList.includes('Services Information')
+									}>
 									<ThemeCard header='Services Information' elevation={8}>
 										<Grid container spacing={2}>
 											<Grid item xs={12}>
@@ -899,7 +900,40 @@ const PriceBookItemForm = ({
 											</Grid>
 										</Grid>
 									</ThemeCard>
-								) : null}
+								</GridInputWrapper>
+							) : null}
+
+							<GridInputWrapper massUpdating={massUpdating}>
+								<ThemeCard header='Aging Product Details' elevation={8}>
+									<Grid container spacing={2}>
+										<Grid item xs={12}>
+											<FormControlLabel
+												control={
+													<Checkbox
+														checked={state.currentData.End_of_Life}
+														onChange={(e) =>
+															mountData('End_of_Life', e.target.checked)
+														}
+													/>
+												}
+												label='End of Life'
+											/>
+										</Grid>
+										<Grid item xs={12}>
+											<FormControlLabel
+												control={
+													<Checkbox
+														checked={state.currentData.End_of_Service}
+														onChange={(e) =>
+															mountData('End_of_Service', e.target.checked)
+														}
+													/>
+												}
+												label='End of Service'
+											/>
+										</Grid>
+									</Grid>
+								</ThemeCard>
 							</GridInputWrapper>
 						</GridFormSectionWrapper>
 					</ThemeCard>

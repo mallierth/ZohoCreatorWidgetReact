@@ -815,7 +815,7 @@ const ServiceOrderForm = ({
 									defaultSortByColumn='First_Name'
 									formName='Contact'
 									reportName='Contacts'
-									defaultCriteria={state.currentData.Account ? `Account == ${state.currentData.Account.ID}` : ''}
+									defaultCriteria={state.currentData.Account ? `Accounts.contains(${state.currentData.Account.ID})` : ''}
 									defaultValue={state.currentData.Contact}
 									onChange={(e) => mountData('Contact', e)}
 									endAdornment={

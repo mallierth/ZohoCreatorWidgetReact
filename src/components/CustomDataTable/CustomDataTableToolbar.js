@@ -183,6 +183,11 @@ CustomDataTableToolbar.propTypes = {
 		onClickDuplicate: PropTypes.func,
 		showDuplicate: PropTypes.bool, //default hidden
 		disableDuplicate: PropTypes.bool,
+
+		//Merge
+		onClickMerge: PropTypes.func,
+		showMerge: PropTypes.bool, //default hidden
+		disableMerge: PropTypes.bool,
 	}),
 	WrapperProps: PropTypes.object,
 };

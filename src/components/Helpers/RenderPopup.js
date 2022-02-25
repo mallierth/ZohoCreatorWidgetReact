@@ -58,6 +58,7 @@ const RenderPopup = ({
 			<Dialog
 				fullScreen={!desktopMode}
 				maxWidth={'xl'}
+				fullWidth
 				open={open}
 				onClose={onClose}
 				PaperComponent={desktopMode ? PaperComponent : Paper}>

@@ -36,6 +36,7 @@ import {
 	FileCopy,
 	FileDownload,
 	FilterAlt,
+	Merge,
 	MoreVert,
 	Search,
 	TableView,
@@ -167,6 +168,11 @@ const TableActions = ({
 	onClickDuplicate,
 	showDuplicate, //default hidden
 	disableDuplicate,
+
+	//Merge
+	onClickMerge,
+	showMerge,
+	disableMerge,
 }) => {
 	//<Box sx={{ visibility: hidden ? 'hidden' : 'visible' }}>
 	return (
@@ -217,6 +223,18 @@ const TableActions = ({
 							disabled={disableMassUpdate}
 							onClick={onClickMassUpdate}
 							Icon={Build}
+							color={color}
+							size={size}
+						/>
+					) : null}
+
+					{/* Merge */}
+					{showMerge ? (
+						<TableActionButton
+							tooltip='Merge'
+							disabled={disableMerge}
+							onClick={onClickMerge}
+							Icon={Merge}
 							color={color}
 							size={size}
 						/>
@@ -330,6 +348,11 @@ TableActions.propTypes = {
 	onClickDuplicate: PropTypes.func,
 	showDuplicate: PropTypes.bool, //default hidden
 	disableDuplicate: PropTypes.bool,
+
+	//Merge
+	onClickMerge: PropTypes.func,
+	showMerge: PropTypes.bool, //default hidden
+	disableMerge: PropTypes.bool,
 };
 
 export default React.memo(TableActions);

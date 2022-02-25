@@ -153,7 +153,7 @@ const ProjectForm = ({
 	const debug = useRecoilValue(debugState);
 	const [alerts, setAlerts] = useState({});
 	const [data, setData] = useState({ ...loadData, ...resource.read() });
-	const [id, setId] = useState(data.ID);
+	const [id, setId] = useState(data?.ID);
 	const baseUrl = `https://creatorapp.zoho.com/visionpointllc/av-professional-services/#Page:Search?Type=${formName}&ID=${id}`;
 	const [recordTitle, setRecordTitle] = useState(data ? data.Name : null); //TODO
 	const [
@@ -379,7 +379,7 @@ const ProjectForm = ({
 					'Service Contract: ' +
 					state?.currentData?.First_Year_Warranty?.display_value,
 				type: 'form',
-				id: state.currentData.First_Year_Warranty.ID,
+				id: state.currentData?.First_Year_Warranty?.ID,
 				name: 'Service_Contract',
 				active: true,
 			},
@@ -395,7 +395,7 @@ const ProjectForm = ({
 					'Opportunity: ' +
 					state?.currentData?.Source_Opportunity?.display_value,
 				type: 'form',
-				id: state.currentData.Source_Opportunity.ID,
+				id: state.currentData?.Source_Opportunity?.ID,
 				name: 'Opportunity',
 				active: true,
 			},
@@ -427,7 +427,7 @@ const ProjectForm = ({
 						options={[
 							{
 								type: 'form',
-								label: `Go to ${state?.currentData?.Source_Opportunity.display_value}`,
+								label: `Go to ${state?.currentData?.Source_Opportunity?.display_value}`,
 								onClick: () => openSourceOpportunityInNewTab(),
 								hidden: !state?.currentData?.Source_Opportunity,
 								Icon: Description,
@@ -1189,7 +1189,17 @@ const ProjectForm = ({
 				}
 				open={pickTicketDialogOpen}
 				onClose={() => setPickTicketDialogOpen(false)}>
-				<ProjectPickTicketReport maxHeight={maxHeight} variant='modal' />
+				<ProjectPickTicketReport
+					maxHeight={maxHeight}
+					variant='modal'
+					referenceId={state.currentData.Reference.ID}
+					phaseId={
+						state.currentData.Enable_Phases === true ||
+						state.currentData.Enable_Phases === 'true'
+							? id
+							: null
+					}
+				/>
 			</RenderPopup>
 
 			{/* Sales Order Line Items */}
@@ -1216,10 +1226,10 @@ const ProjectForm = ({
 					disableRowRightClick
 					maxHeight={maxHeight}
 					forcedCriteria={`Sales_Order.Reference_ID==${
-						state.savedData.Reference ? state.savedData.Reference.ID : '0'
+						state.currentData.Reference ? state.currentData.Reference.ID : '0'
 					}${
-						state.savedData.Enable_Phases &&
-						state.savedData.Enable_Phases !== 'false'
+						state.currentData.Enable_Phases &&
+						state.currentData.Enable_Phases !== 'false'
 							? `&& Project.Phase==${id}`
 							: ''
 					} && Deleted == false && Sales_Order.Type=="Project Order" && Sales_Order.Void_field=false`}
@@ -1231,6 +1241,11 @@ const ProjectForm = ({
 						hideDelete: true,
 					}}
 					additionalColumns={[
+						{
+							field: 'Sales_Order.Description',
+							headerName: 'Room',
+							flex: 3,
+						},
 						{
 							field: 'Sales_Order.Status',
 							headerName: 'Sales Order Status',
@@ -1297,6 +1312,11 @@ const ProjectForm = ({
 							headerName: 'PO Status',
 							flex: 1,
 						},
+						{
+							field: 'Vendor.Name',
+							headerName: 'Vendor',
+							flex: 2,
+						}
 					]}
 				/>
 			</RenderPopup>

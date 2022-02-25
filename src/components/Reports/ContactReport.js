@@ -33,11 +33,11 @@ export const columns = [
 	},
 	{
 		field: 'Affilitation',
-		searchField: ['Account_Name'],
+		searchField: ['Accounts_Names'],
 		flex: 4,
 		valueGetter: ({ row }) => {
-			if (row.Account) {
-				return row.Account.display_value;
+			if (row.Accounts) {
+				return row.Accounts ? row.Accounts.map(x => x.display_value).join(', ') : '';
 			}
 			if (row.Vendor) {
 				return row.Vendor.display_value;
@@ -78,9 +78,10 @@ export const filterColumns = [...columns].sort((a, b) => {
 	}
 });
 
-const ContactReport = ({ maxHeight, variant, forcedCriteria, loadData }) => {
+const ContactReport = ({ maxHeight, variant, forcedCriteria, loadData, ...others }) => {
 	return (
 		<CustomDataTable
+			{...others}
 			formName='Contact'
 			height={maxHeight - 16}
 			forcedCriteria={forcedCriteria}
@@ -88,6 +89,9 @@ const ContactReport = ({ maxHeight, variant, forcedCriteria, loadData }) => {
 			DataGridProps={{
 				checkboxSelection: true,
 				disableSelectionOnClick: true,
+			}}
+			ActionProps={{
+				showMerge: true,
 			}}
 			WrapperProps={{
 				elevation: 4,

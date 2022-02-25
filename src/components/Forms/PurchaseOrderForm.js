@@ -1205,7 +1205,7 @@ const PurchaseOrderForm = ({
 						Parent_ID: state?.savedData?.ID,
 						Subject_field: '',
 						Cc: '',
-						To: '',
+						To: state.currentData.Vendor_Email ? [state.currentData.Vendor_Email] : '',
 						Message: '',
 						From_Update: 'Purchasing',
 						Default_Template_Name: 'Issue to Vendor',
@@ -1214,6 +1214,13 @@ const PurchaseOrderForm = ({
 							...state.currentData,
 							Purchase_Order_Line_Items: lineItemDataState.rows,
 						},
+						Contact_Criteria: state.currentData.Vendor_Primary_Contact_ID
+							? `ID==${state.currentData.Vendor_Primary_Contact_ID}`
+							: state.currentData.Vendor_Contacts_ID
+							? state.currentData.Vendor_Contacts_ID.split(',')
+									.map((contactId) => `ID==${contactId}`)
+									.join(' || ')
+							: '',
 					}}
 					onChange={() =>
 						state?.currentData?.Status !== 'Partially Received' &&

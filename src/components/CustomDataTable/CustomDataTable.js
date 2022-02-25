@@ -501,6 +501,8 @@ const CustomDataGrid = ({
 	const [rowDuplicateDialogOpen, setRowDuplicateDialogOpen] = useState(false);
 	const [duplicationState, duplicateRecord] = useFormData();
 	const [rowDuplicateData, setRowDuplicateData] = useState({});
+	const [rowMergeData, setRowMergeData] = useState({});
+	const [rowMergeDialogOpen, setRowMergeDialogOpen] = useState(false);
 	const formData = useRef(null);
 	//#endregion
 
@@ -1092,6 +1094,35 @@ const CustomDataGrid = ({
 	};
 	//#endregion
 
+	//#region //? Merge
+	const onClickMerge = () => {
+		const _selections = Array.from(selections);
+		const loadData = {};
+
+		Object.keys(_selections[0]).forEach(field => {
+			loadData[field] = [];
+			_selections.forEach(selection => {
+				if(selection[field]) {
+					if(typeof selection[field] !== 'object' && !loadData[field].includes(selection[field])) {
+						//For simple data types, do an includes check to not add duplicates
+						loadData[field].push(selection[field]);
+					} else if (typeof selection[field] === 'object') {
+						loadData[field].push(selection[field]);
+					}
+
+					
+				}
+			});
+		})
+		
+		setRowMergeData(loadData);
+	};
+
+	const onMerge = () => {
+		
+	};
+	//#endregion
+
 	//#region //? Helpers
 
 	const onContextMenu = (e) => {
@@ -1400,6 +1431,11 @@ const CustomDataGrid = ({
 							disableDuplicate:
 								ActionProps.disableDuplicate || selections.length !== 1,
 							showDuplicate: ActionProps.showDuplicate && selections.length > 0,
+
+							onClickMerge,
+							disableMerge:
+								ActionProps.disableMerge || selections.length < 2,
+							showMerge: currentUserIsAdmin && ActionProps.showMerge && selections.length > 1, //TODO
 						}}
 						WrapperProps={{}}
 					/>
@@ -2059,6 +2095,11 @@ CustomDataGrid.propTypes = {
 		onClickDuplicate: PropTypes.func,
 		showDuplicate: PropTypes.bool, //default hidden
 		disableDuplicate: PropTypes.bool,
+
+		//Merge
+		onClickMerge: PropTypes.func,
+		showMerge: PropTypes.bool, //default hidden
+		disableMerge: PropTypes.bool,
 	}), //Useful for the sx prop on
 	WrapperProps: PropTypes.object, //Useful for the sx prop on
 	DataGridProps: PropTypes.object, //Exposes any DataGrid props directly to the outside if needed

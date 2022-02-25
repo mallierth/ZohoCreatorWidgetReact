@@ -69,6 +69,10 @@ import TextFieldDateTime from '../FormControls/TextFieldDateTime';
 import WizardDialog from '../Wizards/WizardDialog';
 import WizardStep from '../Wizards/WizardStep';
 import ContextCircularProgressLoader from '../Loaders/ContextCircularProgressLoader';
+import NoteReport from '../Reports/NoteReport';
+import EmailReport from '../Reports/EmailReport';
+import AttachmentReport from '../Reports/AttachmentReport';
+import CustomerAssetReport from '../Reports/CustomerAssetReport';
 
 //#region //TODO Mass update fields available
 const massUpdateCapableFieldKeys = [
@@ -769,36 +773,38 @@ const CustomerRoomForm = ({
 
 						<TabbedSectionContent>
 							{tabValue === 'Notes' ? (
-								<CustomTable
-									formName='Note'
-									reportName='Notes'
-									defaultSortByColumn='Added_Time'
-									defaultCriteria={`Parent_ID=="${id}"`}
-									tabTable
-									parentId={id}
+								<NoteReport
+									variant='tab'
+									maxHeight={maxHeight}
+									forcedCriteria={`Parent_ID=="${id}"`}
+									loadData={{ Parent_ID: id }}
 								/>
 							) : tabValue === 'Emails' ? (
-								<CustomTable
-									formName='Email'
-									defaultSortByColumn='Added_Time'
-									defaultCriteria={`Parent_ID=="${id}"`}
-									tabTable
-									parentId={id}
+								<EmailReport
+									variant='tab'
+									maxHeight={maxHeight}
+									forcedCriteria={`Parent_ID=="${id}"`}
+									loadData={{ Parent_ID: id }}
 								/>
 							) : tabValue === 'Attachments' ? (
-								<CustomTable
-									formName='Attachment'
-									defaultSortByColumn='Added_Time'
-									defaultCriteria={`Parent_ID=="${id}"`}
-									tabTable
-									parentId={id}
+								<AttachmentReport
+									variant='tab'
+									maxHeight={maxHeight}
+									forcedCriteria={`Parent_ID=="${id}"`}
+									loadData={{ Parent_ID: id }}
 								/>
 							) : tabValue === 'Customer Assets' ? (
-								<CustomTable
-									formName='Customer_Asset'
-									defaultSortByColumn='Name'
-									defaultCriteria={`Customer_Room==${state.savedData.ID}`}
-									tabTable
+								<CustomerAssetReport
+									variant='tab'
+									maxHeight={maxHeight}
+									forcedCriteria={`Customer_Room==${id}`}
+									loadData={{
+										Account: state.currentData.Account,
+										Customer_Room: {
+											ID: id,
+											display_value: state.currentData.Name,
+										},
+									}}
 								/>
 							) : null}
 						</TabbedSectionContent>

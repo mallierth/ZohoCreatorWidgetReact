@@ -115,6 +115,31 @@ const defaultLoadData = {
 	Description: '',
 };
 
+/*
+const docmosisData = {
+    Version: 1,
+    Amount: state.currentData.Amount,
+	Opportunity_Name: state.currentData.Name, //required
+    Project_Name: state.currentData.Alias, //required
+    Salesperson: state.currentData.Owner, //required
+    Salesperson_Title: "", //required
+    Account_Name: state.currentData.Account.display_value, //required
+    Date: dayjs().format('LL'), //required
+    Phone_Number: '', //ifblank
+    Email: currentUser.Email, //ifblank
+
+    //Sections
+    Include_Executive_Summary: true,
+    Include_Our_Story: true,
+    Include_Project_Process: true,
+    Include_Statement_of_Work: true,
+};
+
+
+//Editing required
+//Signature on Acceptance page
+*/
+
 //#endregion
 
 //#region //TODO Helper functions

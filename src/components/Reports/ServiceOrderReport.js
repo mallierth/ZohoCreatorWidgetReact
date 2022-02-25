@@ -75,15 +75,40 @@ export const columns = [
 	},
 	{
 		field: 'Service_Contract',
+		headerName: 'Service Contract',
 		searchField: 'Service_Contract_Name',
 		flex: 2,
 		valueGetter: ({ value }) => value.display_value || '',
 	},
 	{
 		field: 'Billing_Priority',
-		headerName: 'Billing_Priority',
+		headerName: 'Billing Priority',
 		flex: 2,
 		valueOptions: ['Billable', 'Not Billable', 'Partially Billable'],
+	},
+	{
+		field: 'Added_Time',
+		headerName: 'Created',
+		searchField: false,
+		type: 'date',
+		flex: 2,
+		valueGetter: ({ value }) => value && new Date(value)
+	},
+	// {
+	// 	field: 'Date_Requested',
+	// 	headerName: 'Requested',
+	// 	searchField: false,
+	// 	type: 'date',
+	// 	flex: 2,
+	// 	valueGetter: ({ value }) => value && new Date(value)
+	// },
+	{
+		field: 'Date_Completed',
+		headerName: 'Completed',
+		searchField: false,
+		type: 'date',
+		flex: 2,
+		valueGetter: ({ value }) => value && new Date(value)
 	},
 ];
 
