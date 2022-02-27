@@ -4,12 +4,14 @@ import { Box, Button, Typography } from '@mui/material';
 import { Autorenew, Close, } from '@mui/icons-material';
 import ResponsiveDialog from './ResponsiveDialog';
 import DatabaseDefaultIcon from '../Helpers/DatabaseDefaultIcon';
+import { LoadingButton } from '@mui/lab';
 
 const ConvertQuoteToSalesOrderDialog = ({
 	title,
 	open,
 	onClose,
 	onConvert,
+	busy,
 }) => {
 	return (
 		<ResponsiveDialog
@@ -30,12 +32,13 @@ const ConvertQuoteToSalesOrderDialog = ({
 					<Button variant='outlined' startIcon={<Close />} onClick={onClose}>
 						Close
 					</Button>
-					<Button
+					<LoadingButton
 						variant='contained'
 						startIcon={<Autorenew />}
-						onClick={onConvert}>
+						onClick={onConvert}
+						loading={busy}>
 						Convert
-					</Button>
+					</LoadingButton>
 				</>
 			}
 			open={open}
@@ -52,6 +55,7 @@ ConvertQuoteToSalesOrderDialog.propTypes = {
 	open: PropTypes.bool,
 	onClose: PropTypes.func.isRequired,
 	onConvert: PropTypes.func.isRequired,
+	busy: PropTypes.bool,
 };
 
 export default ConvertQuoteToSalesOrderDialog;

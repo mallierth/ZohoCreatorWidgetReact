@@ -93,57 +93,6 @@ const RenderPopup = ({
 		);
 	}
 
-	// return (
-	// 	<Fade in={open} mountOnEnter unmountOnExit>
-	// 		<Box
-	// 			onClick={(e) => {
-	// 				e.stopPropagation();
-	// 				onClose();
-	// 			}}
-	// 			sx={{
-	// 				zIndex: 500,
-	// 				position: 'fixed',
-	// 				top: navBarHeight + tabBarHeight - 1,
-	// 				right: 0,
-	// 				height: `calc(100vh - ${navBarHeight}px - ${tabBarHeight}px + 1px)`,
-	// 				width: 'calc(100% - 50px)',
-	// 				backgroundColor: (theme) =>
-	// 					theme.palette.mode === 'dark'
-	// 						? 'rgba(0, 0, 0, 0.75)'
-	// 						: 'rgba(0, 0, 0, 0.25)',
-	// 			}}>
-	// 			<Slide direction='left' in={open} mountOnEnter unmountOnExit>
-	// 				<Box
-	// 					onClick={(e) => e.stopPropagation()}
-	// 					sx={{
-	// 						position: 'fixed',
-	// 						top: navBarHeight + tabBarHeight - 1,
-	// 						right: 0,
-	// 						height: `calc(100vh - ${navBarHeight}px - ${tabBarHeight}px + 1px)`,
-	// 						width: `${formMaxWidth}px`,
-	// 						maxWidth: maxWidth ? maxWidth : formMaxWidth,
-	// 						backgroundColor: 'background.default',
-	// 					}}>
-	// 					<AppBar color='default' enableColorOnDark position='relative'>
-	// 						<Toolbar
-	// 							color='inherit'
-	// 							sx={{
-	// 								px: { xs: 1 },
-	// 								justifyContent: 'space-between',
-	// 							}}>
-	// 							{title ? title : <Box></Box>}
-	// 							<IconButton onClick={onClose} color='inherit'>
-	// 								<Close />
-	// 							</IconButton>
-	// 						</Toolbar>
-	// 					</AppBar>
-	// 					{children}
-	// 				</Box>
-	// 			</Slide>
-	// 		</Box>
-	// 	</Fade>
-	// );
-
 	return (
 		<>
 			{desktopMode ? (

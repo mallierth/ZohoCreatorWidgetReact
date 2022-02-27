@@ -50,7 +50,7 @@ import dayjs from 'dayjs';
 import DuplicateRecordDialog from '../Modals/DuplicateRecordDialog';
 import { getReferenceFormType } from '../Helpers/functions';
 import ToastMessage from '../ToastMessage/ToastMessage';
-import { currentUserIsAdminState } from '../../recoil/selectors';
+import { currentUserIsAdminState, currentUserCanDeleteRecordsState } from '../../recoil/selectors';
 import { darken, lighten } from '@mui/material/styles';
 import RenderPopup from '../Helpers/RenderPopup';
 //#endregion
@@ -434,6 +434,7 @@ const CustomDataGrid = ({
 	const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
 	const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
 	const currentUserIsAdmin = useRecoilValue(currentUserIsAdminState);
+	const currentUserCanDeleteRecords = useRecoilValue(currentUserCanDeleteRecordsState);
 	const [updateCurrentUserState, , updateCurrentUser] = useFormData({
 		...currentUser,
 	});
@@ -1419,8 +1420,7 @@ const CustomDataGrid = ({
 								ActionProps.hideMassUpdate || selections.length === 0,
 							//Delete
 							onClickDelete,
-							disableDelete:
-								!currentUserIsAdmin && reportName !== 'Attachments', //TODO open this up
+							disableDelete: ActionProps.disableDelete,
 							hideDelete: ActionProps.hideDelete || selections.length === 0,
 							//Export
 							onClickExport,

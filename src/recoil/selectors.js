@@ -36,6 +36,14 @@ export const currentUserIsAdminState = selector({
 	},
 });
 
+export const currentUserCanDeleteRecordsState = selector({
+	key: 'currentUserCanDeleteRecordsState',
+	get: ({ get }) => {
+		const currentUser = get(currentUserState);
+		return Boolean(currentUser?.Can_Delete_Records === true || currentUser?.Can_Delete_Records === 'true');
+	},
+});
+
 export const currentUserIsHelpAdminState = selector({
 	key: 'currentUserIsHelpAdminState',
 	get: ({ get }) => {

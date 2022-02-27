@@ -107,6 +107,20 @@ const massUpdateCapableFieldKeys = [
 	{ label: 'Project Manager', value: 'Project_Manager' },
 	{ label: 'Category', value: 'Category' },
 ];
+
+const defaultLoadData = {
+	Status: '',
+	Alias: '',
+	Number: '',
+	Account: '',
+	Accounts: '',
+	Contacts: '',
+	Project_Manager: '',
+	Category: 'Internal',
+	Description: '',
+	Teamwork_Project_URL: '',
+	Completed_Closeout_Audit: false,
+}
 //#endregion
 
 //#region //TODO Helper functions
@@ -152,7 +166,7 @@ const ProjectForm = ({
 	);
 	const debug = useRecoilValue(debugState);
 	const [alerts, setAlerts] = useState({});
-	const [data, setData] = useState({ ...loadData, ...resource.read() });
+	const [data, setData] = useState({ ...defaultLoadData, ...loadData, ...resource.read() });
 	const [id, setId] = useState(data?.ID);
 	const baseUrl = `https://creatorapp.zoho.com/visionpointllc/av-professional-services/#Page:Search?Type=${formName}&ID=${id}`;
 	const [recordTitle, setRecordTitle] = useState(data ? data.Name : null); //TODO
@@ -163,7 +177,7 @@ const ProjectForm = ({
 		mountData,
 		resetData,
 		massUpdateRecords,
-	] = useFormData(data, loadData);
+	] = useFormData(data, { ...defaultLoadData, ...loadData});
 
 	const [conversionState, convertLineItemsToAssets] = useFormData();
 
@@ -326,7 +340,7 @@ const ProjectForm = ({
 						}
 					);
 				} else {
-					addRecord(formName, state.data, (response) => setId(response.ID));
+					addRecord(formName, state.data, (response) => setId(response?.ID));
 				}
 			}
 		} else {
@@ -999,7 +1013,7 @@ const ProjectForm = ({
 									forcedCriteria={`
 										Parent_ID=="${
 											state.savedData.Reference
-												? state.savedData.Reference.ID
+												? state.savedData.Reference?.ID
 												: '0'
 										}" || 
 										Child_ID=="${id}" || Parent_ID=="${id}"
@@ -1016,7 +1030,7 @@ const ProjectForm = ({
 									maxHeight={600}
 									forcedCriteria={`Reference==${
 										state.savedData.Reference
-											? state.savedData.Reference.ID
+											? state.savedData.Reference?.ID
 											: '0'
 									}${
 										state.savedData.Enable_Phases &&
@@ -1035,7 +1049,7 @@ const ProjectForm = ({
 									maxHeight={600}
 									forcedCriteria={`Reference==${
 										state.savedData.Reference
-											? state.savedData.Reference.ID
+											? state.savedData.Reference?.ID
 											: '0'
 									}${
 										state.savedData.Enable_Phases &&
@@ -1054,7 +1068,7 @@ const ProjectForm = ({
 									maxHeight={600}
 									forcedCriteria={`Reference==${
 										state.savedData.Reference
-											? state.savedData.Reference.ID
+											? state.savedData.Reference?.ID
 											: '0'
 									}${
 										state.savedData.Enable_Phases &&
@@ -1073,7 +1087,7 @@ const ProjectForm = ({
 									maxHeight={600}
 									forcedCriteria={`Reference==${
 										state.savedData.Reference
-											? state.savedData.Reference.ID
+											? state.savedData.Reference?.ID
 											: '0'
 									}${
 										state.savedData.Enable_Phases &&
@@ -1092,7 +1106,7 @@ const ProjectForm = ({
 									maxHeight={maxHeight}
 									forcedCriteria={`Reference==${
 										state.savedData.Reference
-											? state.savedData.Reference.ID
+											? state.savedData.Reference?.ID
 											: '0'
 									}${
 										state.savedData.Enable_Phases &&
@@ -1112,7 +1126,7 @@ const ProjectForm = ({
 									maxHeight={maxHeight}
 									forcedCriteria={`Reference==${
 										state.savedData.Reference
-											? state.savedData.Reference.ID
+											? state.savedData.Reference?.ID
 											: '0'
 									}${
 										state.savedData.Enable_Phases &&
@@ -1131,7 +1145,7 @@ const ProjectForm = ({
 									maxHeight={maxHeight}
 									forcedCriteria={`Reference==${
 										state.savedData.Reference
-											? state.savedData.Reference.ID
+											? state.savedData.Reference?.ID
 											: '0'
 									}${
 										state.savedData.Enable_Phases &&
@@ -1192,7 +1206,7 @@ const ProjectForm = ({
 				<ProjectPickTicketReport
 					maxHeight={maxHeight}
 					variant='modal'
-					referenceId={state.currentData.Reference.ID}
+					referenceId={state.currentData.Reference?.ID}
 					phaseId={
 						state.currentData.Enable_Phases === true ||
 						state.currentData.Enable_Phases === 'true'
@@ -1226,7 +1240,7 @@ const ProjectForm = ({
 					disableRowRightClick
 					maxHeight={maxHeight}
 					forcedCriteria={`Sales_Order.Reference_ID==${
-						state.currentData.Reference ? state.currentData.Reference.ID : '0'
+						state.currentData.Reference ? state.currentData.Reference?.ID : '0'
 					}${
 						state.currentData.Enable_Phases &&
 						state.currentData.Enable_Phases !== 'false'
@@ -1292,7 +1306,7 @@ const ProjectForm = ({
 					disableRowRightClick
 					maxHeight={maxHeight}
 					forcedCriteria={`Purchase_Order.Reference_ID==${
-						state.savedData.Reference ? state.savedData.Reference.ID : '0'
+						state.savedData.Reference ? state.savedData.Reference?.ID : '0'
 					}${
 						state.savedData.Enable_Phases &&
 						state.savedData.Enable_Phases !== 'false'
@@ -1484,7 +1498,7 @@ const ProjectForm = ({
 								onClick={() => {
 									console.log(
 										'',
-										JSON.stringify(customerAssetList.map((x) => x.ID))
+										JSON.stringify(customerAssetList.map((x) => x?.ID))
 									);
 									let _conversionData = {
 										Source_Form: 'Sales_Order_Line_Item',

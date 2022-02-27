@@ -157,6 +157,7 @@ const QuoteForm = ({
 		massUpdateRecords,
 	] = useFormData(data, { ...defaultLoadData, ...loadData });
 	const [conversionState, convertQuoteToSalesOrder] = useFormData();
+	const [convertQuoteToSalesOrderBusy, setConvertQuoteToSalesOrderBusy] = useState(false);
 	const [lineItemDataState, lineItemDispatch] = useCustomTableLineItemFormData(
 		formName,
 		data
@@ -466,6 +467,7 @@ const QuoteForm = ({
 
 	//#region //! Commands exposed by Actions dropdown
 	const onConvertToSalesOrder = () => {
+		setConvertQuoteToSalesOrderBusy(true);
 		let _conversionData = {
 			Source_Form: 'Quote',
 			Source_Record_ID: id,
@@ -484,8 +486,10 @@ const QuoteForm = ({
 				setConvertDialogOpen(false);
 				mountData('Status', 'Accepted');
 				mountData('Converted_to', _salesOrderData);
+				setConvertQuoteToSalesOrderBusy(false);
 			}
 		);
+		setConvertQuoteToSalesOrderBusy(false);
 	};
 
 	const openSalesOrderInNewTab = (salesOrderData) => {
@@ -985,6 +989,7 @@ const QuoteForm = ({
 				open={convertDialogOpen}
 				onClose={() => setConvertDialogOpen(false)}
 				onConvert={onConvertToSalesOrder}
+				busy={convertQuoteToSalesOrderBusy}
 			/>
 
 			{/* Void Dialog */}

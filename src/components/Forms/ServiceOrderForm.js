@@ -1079,11 +1079,11 @@ const ServiceOrderForm = ({
 									forcedCriteria={`Reference==${state?.savedData?.Reference?.ID}`}
 									loadData={{
 										Service_Order: id,
-										Service_Contract: state?.savedData?.Service_Contract,
+										Service_Contract: state?.savedData?.Service_Contract?.ID,
 										Parent_ID: id,
-										Reference: state?.savedData?.Reference,
-										Account: state?.savedData?.Account,
-										Contact: state.savedData?.Contact,
+										Reference: state?.savedData?.Reference?.ID,
+										Account: state?.savedData?.Account?.ID,
+										Contact: state.savedData?.Contact?.ID,
 									}}
 									WrapperProps={{
 										sx: {
