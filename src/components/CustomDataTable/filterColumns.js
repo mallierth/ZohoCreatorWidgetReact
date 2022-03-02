@@ -25,6 +25,7 @@ export { filterColumns as salesOrderFilterColumns } from '../Reports/SalesOrderR
 export { filterColumns as serialNumberFilterColumns } from '../Reports/SerialNumberReport';
 export { filterColumns as serviceContractFilterColumns } from '../Reports/ServiceContractReport';
 export { filterColumns as serviceOrderFilterColumns } from '../Reports/ServiceOrderReport';
+export { filterColumns as serviceRequestFilterColumns } from '../Reports/ServiceRequestReport';
 export { filterColumns as subcontractorFilterColumns } from '../Reports/SubcontractorReport';
 export { filterColumns as subscriptionFilterColumns } from '../Reports/SubscriptionReport';
 export { filterColumns as taskFilterColumns } from '../Reports/TaskReport';

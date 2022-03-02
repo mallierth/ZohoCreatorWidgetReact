@@ -1689,10 +1689,10 @@ const AccountForm = ({
 								<ContactReport
 									variant='tab'
 									maxHeight={maxHeight}
-									forcedCriteria={`Account==${id}`}
+									forcedCriteria={`Accounts.contains(${id})`}
 									loadData={{
 										Type: 'Account',
-										Account: { ID: id, display_value: state.currentData.Name },
+										Accounts: [{ ID: id, display_value: state.currentData.Name }],
 									}}
 								/>
 							) : null}

@@ -25,6 +25,7 @@ export { columns as salesOrderColumns } from '../Reports/SalesOrderReport';
 export { columns as serialNumberColumns } from '../Reports/SerialNumberReport';
 export { columns as serviceContractColumns } from '../Reports/ServiceContractReport';
 export { columns as serviceOrderColumns } from '../Reports/ServiceOrderReport';
+export { columns as serviceRequestColumns } from '../Reports/ServiceRequestReport';
 export { columns as subcontractorColumns } from '../Reports/SubcontractorReport';
 export { columns as subscriptionColumns } from '../Reports/SubscriptionReport';
 export { columns as taskColumns } from '../Reports/TaskReport';

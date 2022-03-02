@@ -12,6 +12,7 @@ const GenerateProposalDialog = ({
 	onClose,
 	printData,
 	children,
+	disabled,
 }) => {
 	return (
 		<ResponsiveDialog
@@ -33,9 +34,10 @@ const GenerateProposalDialog = ({
 					</Button>
 					<DocmosisButton
 						type='word'
-						templatePath='Opportunities/Proposal v1.docx'
+						templatePath='Opportunities/Docmosis Proposal Template.docx'
 						outputFileName={title}
 						data={printData}
+						disabled={disabled}
 					/>
 				</>
 			}
@@ -51,7 +53,7 @@ GenerateProposalDialog.propTypes = {
 	title: PropTypes.string.isRequired,
 	open: PropTypes.bool,
 	onClose: PropTypes.func.isRequired,
-
+	disabled:PropTypes.bool,
 	children: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
 };
 

@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as Columns from '../../recoil/columnAtoms';
 import DatabaseDefaultIcon from '../Helpers/DatabaseDefaultIcon';
 import LookupField2 from '../FormControls/LookupField2';
+import { getAllRecords } from '../../apis/ZohoCreator';
 import AsynchronousSelect2 from '../FormControls/AsynchronousSelect2';
 import BottomBar from '../Helpers/BottomBar';
 import {
@@ -25,7 +26,11 @@ import {
 	Autocomplete,
 	Box,
 	Button,
-	CircularProgress,
+	Checkbox,
+	FormControl,
+	FormControlLabel,
+	FormGroup,
+	FormLabel,
 	Divider,
 	Grid,
 	IconButton,
@@ -52,6 +57,7 @@ import {
 	Email,
 	ExpandMore,
 	FileDownload,
+	Info,
 	MoreVert,
 	Print,
 	Share,
@@ -113,6 +119,18 @@ const defaultLoadData = {
 	Source: '',
 	Closing_Date: '',
 	Description: '',
+};
+
+const proposalRequiredFields = {
+	Salesperson: true,
+	Email: false,
+	Salesperson_Title: true,
+	Phone_Number: false,
+	Account_Name: true,
+	Project_Name: true,
+	Version_Number: true,
+	Date: true,
+	Amount: true,
 };
 
 /*
@@ -182,18 +200,17 @@ const OpportunityForm = ({
 		resetData,
 		massUpdateRecords,
 	] = useFormData(data, { ...defaultLoadData, ...loadData });
+	const [proposalPrintState, , , mountProposalPrintState] = useFormData();
 	const [conversionState, conversionRequest] = useFormData();
 	const [massUpdateFieldList, setMassUpdateFieldList] = useState([]);
 	const requiredFields = useRef(columns.filter((column) => column.required));
 	const [error, setError] = useState({});
+	const [proposalError, setProposalError] = useState({});
 	const [toastData, setToastData] = useState({});
-	const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
-	const [confirmationDialogData, setConfirmationDialogData] = useState({});
 	const [timelineOpen, setTimelineOpen] = useState(false);
 	const [tabValue, setTabValue] = useState('Notes');
 	const [closedWonDialogOpen, setClosedWonDialogOpen] = useState(false);
 	const [closedWonQuotes, setClosedWonQuotes] = useState([]);
-	const [printData, setPrintData] = useState({});
 	const [generateProposalDialogOpen, setGenerateProposalDialogOpen] =
 		useState(false);
 	const [voidDialogOpen, setVoidDialogOpen] = useState(false);
@@ -233,13 +250,6 @@ const OpportunityForm = ({
 
 	//#region //! Update parent table row if applicable
 	useEffect(() => {
-		//? Print Data updates
-		setPrintData((old) => ({
-			...old,
-			Account: state?.currentData?.Account,
-			Salesperson: state?.currentData?.Owner,
-		}));
-
 		if (onChange) {
 			onChange(state.savedData);
 		}
@@ -292,6 +302,10 @@ const OpportunityForm = ({
 			);
 		}
 	}, [state]);
+
+	useEffect(() => {
+		isPrintStateValid();
+	}, [proposalPrintState]);
 	//#endregion
 
 	//#region //! Data save/autosave/reset/validity
@@ -394,6 +408,28 @@ const OpportunityForm = ({
 		}
 
 		setError(_error);
+		return Object.keys(_error).length === 0; //if _error = {}, returns true
+	};
+
+	const isPrintStateValid = () => {
+		let _error = {};
+		let requiredFields = Object.keys(proposalRequiredFields).filter(
+			(key) => proposalRequiredFields[key]
+		);
+		if (requiredFields.length > 0) {
+			requiredFields.forEach((field) => {
+				if (
+					!proposalPrintState.currentData[field] ||
+					proposalPrintState.currentData[field] === 0 ||
+					(Array.isArray(proposalPrintState.currentData[field]) &&
+						proposalPrintState.currentData[field].length === 0)
+				) {
+					_error[field] = true;
+				}
+			});
+		}
+
+		setProposalError(_error);
 		return Object.keys(_error).length === 0; //if _error = {}, returns true
 	};
 	//#endregion
@@ -550,7 +586,56 @@ const OpportunityForm = ({
 							{
 								type: 'form',
 								label: 'Generate Proposal',
-								onClick: () => setGenerateProposalDialogOpen(true),
+								onClick: async () => {
+									mountProposalPrintState(
+										'Account_Name',
+										state?.currentData?.Account?.display_value || ''
+									);
+									mountProposalPrintState(
+										'Project_Name',
+										state?.currentData?.Alias || ''
+									);
+									mountProposalPrintState('Salesperson', currentUser.Full_Name);
+									mountProposalPrintState('Version_Number', 1);
+									mountProposalPrintState('Email', currentUser.Email);
+									mountProposalPrintState('Phone_Number', '');
+									mountProposalPrintState('Include_Executive_Summary', true);
+									mountProposalPrintState('Include_Our_Story', true);
+									mountProposalPrintState('Include_Project_Process', true);
+									mountProposalPrintState('Include_Statement_of_Work', true);
+									mountProposalPrintState(
+										'Amount',
+										state.currentData?.Amount || 0
+									);
+									mountProposalPrintState('Date', dayjs().format('LL'));
+									mountProposalPrintState('Salesperson_Title', '');
+									const quotes = await getAllRecords(
+										'Quotes',
+										`Type=="Quote" && Void_field=false && Reference==${
+											state.savedData.Reference
+												? state.savedData.Reference.ID
+												: '0'
+										}${
+											state.savedData.Enable_Phases &&
+											state.savedData.Enable_Phases !== 'false'
+												? `&& Phase==${id}`
+												: ''
+										}`
+									);
+									if (quotes && quotes.length > 0) {
+										mountProposalPrintState(
+											'Rooms',
+											quotes.map((quote) => ({
+												Name: quote.Description,
+												Amount: '',
+												Description: '',
+											}))
+										);
+									} else {
+										mountProposalPrintState('Rooms', []);
+									}
+									setGenerateProposalDialogOpen(true);
+								},
 								Icon: Print,
 							},
 							{
@@ -1134,37 +1219,296 @@ const OpportunityForm = ({
 
 			{/* Form specific children (e.g. Email, Print Wizard) */}
 			<GenerateProposalDialog
-				title={state?.currentData?.Name}
+				title={`${state?.currentData?.Name} Proposal.docx`}
 				open={generateProposalDialogOpen}
 				onClose={() => setGenerateProposalDialogOpen(false)}
-				printData={printData}>
-				<GridFormSectionWrapper>
-					<Grid item xs={12}>
-						<TextField
-							label='Enter a Salesperson Name'
-							value={printData.Salesperson}
-							onChange={(e) =>
-								setPrintData((old) => ({ ...old, Salesperson: e.target.value }))
-							}
-						/>
-					</Grid>
-					<Grid item xs={12}>
-						<LookupField2
-							name='Account'
-							label='Select an Account'
-							defaultSortByColumn='Name'
-							reportName='Accounts_Report'
-							defaultValue={printData.Account}
-							onChange={(e) => setPrintData((old) => ({ ...old, Account: e }))}
-							endAdornment={
-								<IconButton edge='end' size='large'>
-									<DatabaseDefaultIcon form='Account' />
-								</IconButton>
-							}
-							overrideDialogZindex
-						/>
-					</Grid>
-				</GridFormSectionWrapper>
+				printData={proposalPrintState.currentData}
+				disabled={
+					(proposalPrintState.data &&
+						Object.keys(proposalPrintState.data).length === 0) ||
+					Object.values(proposalError).includes(true) ||
+					proposalPrintState.status === 'saving' ||
+					proposalPrintState.status === 'deleting'
+				}>
+				<ThemeCard
+					sx={{ mt: 2 }}
+					header='General'
+					headerButtons={[
+						<Tooltip
+							key={1}
+							title='You can manually edit/override any data below like your name or the Account name'>
+							<Info color='info' />
+						</Tooltip>,
+					]}>
+					<GridFormSectionWrapper>
+						<Grid item xs={12} md={6}>
+							<TextField
+								label='Enter a Salesperson Name'
+								value={proposalPrintState.currentData.Salesperson}
+								onChange={(e) =>
+									mountProposalPrintState('Salesperson', e.target.value)
+								}
+								required={Boolean(proposalRequiredFields.Salesperson)}
+								error={proposalError.Salesperson}
+							/>
+						</Grid>
+						<Grid item xs={12} md={6}>
+							<TextField
+								label='Email'
+								value={proposalPrintState.currentData.Email}
+								onChange={(e) =>
+									mountProposalPrintState('Email', e.target.value)
+								}
+								type='email'
+								required={Boolean(proposalRequiredFields.Email)}
+								error={proposalError.Email}
+							/>
+						</Grid>
+						<Grid item xs={12} md={6}>
+							<TextField
+								label='Title'
+								value={proposalPrintState.currentData.Salesperson_Title}
+								onChange={(e) =>
+									mountProposalPrintState('Salesperson_Title', e.target.value)
+								}
+								helperText='Displayed on the Acceptance page'
+								required={Boolean(proposalRequiredFields.Salesperson_Title)}
+								error={proposalError.Salesperson_Title}
+							/>
+						</Grid>
+						<Grid item xs={12} md={6}>
+							<TextField
+								label='Salesperson Phone Number'
+								value={proposalPrintState.currentData.Phone_Number}
+								onChange={(e) =>
+									mountProposalPrintState('Phone_Number', e.target.value)
+								}
+								required={Boolean(proposalRequiredFields.Phone_Number)}
+								error={proposalError.Phone_Number}
+							/>
+						</Grid>
+						<Grid item xs={12} md={6}>
+							<TextField
+								label='Account Name'
+								value={proposalPrintState.currentData.Account_Name}
+								onChange={(e) =>
+									mountProposalPrintState('Account_Name', e.target.value)
+								}
+								required={Boolean(proposalRequiredFields.Account_Name)}
+								error={proposalError.Account_Name}
+							/>
+						</Grid>
+						<Grid item xs={12} md={6}>
+							<TextField
+								label='Project Name'
+								value={proposalPrintState.currentData.Project_Name}
+								onChange={(e) =>
+									mountProposalPrintState('Project_Name', e.target.value)
+								}
+								required={Boolean(proposalRequiredFields.Project_Name)}
+								error={proposalError.Project_Name}
+							/>
+						</Grid>
+						<Grid item xs={12} md={6}>
+							<TextField
+								label='Version#'
+								value={proposalPrintState.currentData.Version_Number}
+								onChange={(e) =>
+									mountProposalPrintState('Version_Number', e.target.value)
+								}
+								type='number'
+								required={Boolean(proposalRequiredFields.Version_Number)}
+								error={proposalError.Version_Number}
+							/>
+						</Grid>
+						<Grid item xs={12} md={6}>
+							<TextField
+								label='Date'
+								value={proposalPrintState.currentData.Date}
+								onChange={(e) =>
+									mountProposalPrintState('Date', e.target.value)
+								}
+								required={Boolean(proposalRequiredFields.Date)}
+								error={proposalError.Date}
+							/>
+						</Grid>
+						<Grid item xs={12} md={6}>
+							<TextField
+								label='Amount'
+								value={proposalPrintState.currentData.Amount}
+								onChange={(e) =>
+									mountProposalPrintState('Amount', e.target.value)
+								}
+								type='number'
+								required={Boolean(proposalRequiredFields.Amount)}
+								error={proposalError.Amount}
+							/>
+						</Grid>
+					</GridFormSectionWrapper>
+				</ThemeCard>
+				<ThemeCard
+					sx={{ mt: 2 }}
+					header='Proposal Sections'
+					headerButtons={[
+						<Tooltip
+							key={1}
+							title='Whichever sections are unchecked below will be entirely omitted from the generated proposal'>
+							<Info color='info' />
+						</Tooltip>,
+					]}>
+					<GridFormSectionWrapper>
+						<Grid item xs={12} md={6}>
+							<FormControl
+								sx={{ m: 3 }}
+								required
+								error={
+									!proposalPrintState.currentData.Include_Executive_Summary &&
+									!proposalPrintState.currentData.Include_Our_Story &&
+									!proposalPrintState.currentData.Include_Project_Process &&
+									!proposalPrintState.currentData.Include_Statement_of_Work
+								}
+								component='fieldset'
+								variant='standard'>
+								<FormGroup>
+									<FormControlLabel
+										control={
+											<Checkbox
+												checked={
+													proposalPrintState.currentData
+														.Include_Executive_Summary
+												}
+												onChange={(e) =>
+													mountProposalPrintState(
+														'Include_Executive_Summary',
+														e.target.checked
+													)
+												}
+											/>
+										}
+										label='Executive Summary'
+									/>
+									<FormControlLabel
+										control={
+											<Checkbox
+												checked={
+													proposalPrintState.currentData.Include_Our_Story
+												}
+												onChange={(e) =>
+													mountProposalPrintState(
+														'Include_Our_Story',
+														e.target.checked
+													)
+												}
+											/>
+										}
+										label='Our Story'
+									/>
+									<FormControlLabel
+										control={
+											<Checkbox
+												checked={
+													proposalPrintState.currentData.Include_Project_Process
+												}
+												onChange={(e) =>
+													mountProposalPrintState(
+														'Include_Project_Process',
+														e.target.checked
+													)
+												}
+											/>
+										}
+										label='Project Process'
+									/>
+									<FormControlLabel
+										control={
+											<Checkbox
+												checked={
+													proposalPrintState.currentData
+														.Include_Statement_of_Work
+												}
+												onChange={(e) =>
+													mountProposalPrintState(
+														'Include_Statement_of_Work',
+														e.target.checked
+													)
+												}
+											/>
+										}
+										label='Statement of Work'
+									/>
+								</FormGroup>
+							</FormControl>
+						</Grid>
+					</GridFormSectionWrapper>
+				</ThemeCard>
+				<ThemeCard
+					sx={{ mt: 2 }}
+					header='Room Details'
+					headerButtons={[
+						<Tooltip
+							key={1}
+							title='This section will populate data mainly in the Scope of Work section'>
+							<Info color='info' />
+						</Tooltip>,
+					]}>
+					<GridFormSectionWrapper>
+						{proposalPrintState?.currentData?.Rooms &&
+						proposalPrintState?.currentData?.Rooms?.length > 0
+							? proposalPrintState.currentData.Rooms.map((room, i) => (
+									<Grid key={room.Name} item xs={12}>
+										<Grid container spacing={2}>
+											<Grid item xs={5}>
+												<TextField
+													label='Name'
+													value={room.Name}
+													onChange={(e) => {
+														let _rooms = Array.from(
+															proposalPrintState.currentData.Rooms
+														);
+														let [_oldRoom] = _rooms.splice(i, 1);
+														_oldRoom.Name = e.target.value;
+														_rooms.splice(i, 0, _oldRoom);
+														mountProposalPrintState('Rooms', _rooms);
+													}}
+												/>
+											</Grid>
+											<Grid item xs={5}>
+												<TextField
+													label='Description'
+													value={room.Description}
+													onChange={(e) => {
+														let _rooms = Array.from(
+															proposalPrintState.currentData.Rooms
+														);
+														let [_oldRoom] = _rooms.splice(i, 1);
+														_oldRoom.Description = e.target.value;
+														_rooms.splice(i, 0, _oldRoom);
+														mountProposalPrintState('Rooms', _rooms);
+													}}
+												/>
+											</Grid>
+											<Grid item xs={2}>
+												<TextField
+													label='Amount'
+													value={room.Amount}
+													onChange={(e) => {
+														let _rooms = Array.from(
+															proposalPrintState.currentData.Rooms
+														);
+														let [_oldRoom] = _rooms.splice(i, 1);
+														_oldRoom.Amount = e.target.value;
+														_rooms.splice(i, 0, _oldRoom);
+														mountProposalPrintState('Rooms', _rooms);
+													}}
+													type='number'
+												/>
+											</Grid>
+										</Grid>
+									</Grid>
+							  ))
+							: null}
+					</GridFormSectionWrapper>
+				</ThemeCard>
 			</GenerateProposalDialog>
 
 			{/* Toast messaging in lower right */}

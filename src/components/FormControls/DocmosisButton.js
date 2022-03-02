@@ -54,7 +54,7 @@ const DocmosisButton = ({
 						});
 						const response = await generateDocument(
 							templatePath,
-							`${outputFileName}.doc`,
+							`${outputFileName}`,
 							_data,
 							currentUser.Full_Name
 						);
@@ -65,7 +65,7 @@ const DocmosisButton = ({
 								severity: 'success',
 							});
 							setBase64Data(
-								'data:application/doc;base64,' + response.data.resultFile
+								'data:application/docx;base64,' + response.data.resultFile
 							);
 						} else {
 							//! Error
@@ -92,7 +92,7 @@ const DocmosisButton = ({
 						setBusy(true);
 						const response = await generateDocument(
 							templatePath,
-							`${outputFileName}.pdf`,
+							`${outputFileName}`,
 							_data,
 							currentUser.Full_Name
 						);

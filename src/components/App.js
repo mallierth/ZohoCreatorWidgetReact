@@ -72,6 +72,7 @@ import SalesOrderLineItemReport from './Reports/SalesOrderLineItemReport';
 import SerialNumberReport from './Reports/SerialNumberReport';
 import ServiceContractReport from './Reports/ServiceContractReport';
 import ServiceOrderReport from './Reports/ServiceOrderReport';
+import ServiceRequestReport from './Reports/ServiceRequestReport';
 import SubcontractorReport from './Reports/SubcontractorReport';
 import SubscriptionReport from './Reports/SubscriptionReport';
 import TaskReport from './Reports/TaskReport';
@@ -643,6 +644,17 @@ const App = () => {
 				return (
 					<React.Suspense fallback={<Loader show />}>
 						<ServiceOrderReport maxHeight={maxHeight} maxWidth={maxWidth} />
+					</React.Suspense>
+				);
+			case 'Service_Requests':
+				//Render a record
+				if (params.ID) {
+					return <RenderForm id={params.ID} formName={'Service_Request'} />;
+				}
+				//Render a report
+				return (
+					<React.Suspense fallback={<Loader show />}>
+						<ServiceRequestReport maxHeight={maxHeight} maxWidth={maxWidth} />
 					</React.Suspense>
 				);
 			case 'Subcontractors':

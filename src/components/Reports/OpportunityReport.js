@@ -94,6 +94,7 @@ export const columns = [
 		searchField: false,
 		flex: 1,
 		type: 'date',
+		valueGetter: ({ value }) => value && new Date(value)
 	},
 ];
 

@@ -50,7 +50,10 @@ import dayjs from 'dayjs';
 import DuplicateRecordDialog from '../Modals/DuplicateRecordDialog';
 import { getReferenceFormType } from '../Helpers/functions';
 import ToastMessage from '../ToastMessage/ToastMessage';
-import { currentUserIsAdminState, currentUserCanDeleteRecordsState } from '../../recoil/selectors';
+import {
+	currentUserIsAdminState,
+	currentUserCanDeleteRecordsState,
+} from '../../recoil/selectors';
 import { darken, lighten } from '@mui/material/styles';
 import RenderPopup from '../Helpers/RenderPopup';
 //#endregion
@@ -434,7 +437,9 @@ const CustomDataGrid = ({
 	const mobileMode = useMediaQuery(theme.breakpoints.down('md'));
 	const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
 	const currentUserIsAdmin = useRecoilValue(currentUserIsAdminState);
-	const currentUserCanDeleteRecords = useRecoilValue(currentUserCanDeleteRecordsState);
+	const currentUserCanDeleteRecords = useRecoilValue(
+		currentUserCanDeleteRecordsState
+	);
 	const [updateCurrentUserState, , updateCurrentUser] = useFormData({
 		...currentUser,
 	});
@@ -620,7 +625,7 @@ const CustomDataGrid = ({
 		if (term) {
 			var searchCriteriaArr = [];
 			columns
-				.filter((column) => column.searchField !== false)
+				.filter((column) => column.searchField !== false) // !currentUserIsAdmin ?  column.adminOnly
 				.forEach((column) => {
 					let searchFieldType = column.searchFieldType
 						? column.searchFieldType
@@ -1100,28 +1105,27 @@ const CustomDataGrid = ({
 		const _selections = Array.from(selections);
 		const loadData = {};
 
-		Object.keys(_selections[0]).forEach(field => {
+		Object.keys(_selections[0]).forEach((field) => {
 			loadData[field] = [];
-			_selections.forEach(selection => {
-				if(selection[field]) {
-					if(typeof selection[field] !== 'object' && !loadData[field].includes(selection[field])) {
+			_selections.forEach((selection) => {
+				if (selection[field]) {
+					if (
+						typeof selection[field] !== 'object' &&
+						!loadData[field].includes(selection[field])
+					) {
 						//For simple data types, do an includes check to not add duplicates
 						loadData[field].push(selection[field]);
 					} else if (typeof selection[field] === 'object') {
 						loadData[field].push(selection[field]);
 					}
-
-					
 				}
 			});
-		})
-		
+		});
+
 		setRowMergeData(loadData);
 	};
 
-	const onMerge = () => {
-		
-	};
+	const onMerge = () => {};
 	//#endregion
 
 	//#region //? Helpers
@@ -1433,9 +1437,11 @@ const CustomDataGrid = ({
 							showDuplicate: ActionProps.showDuplicate && selections.length > 0,
 
 							onClickMerge,
-							disableMerge:
-								ActionProps.disableMerge || selections.length < 2,
-							showMerge: currentUserIsAdmin && ActionProps.showMerge && selections.length > 1, //TODO
+							disableMerge: ActionProps.disableMerge || selections.length < 2,
+							showMerge:
+								currentUserIsAdmin &&
+								ActionProps.showMerge &&
+								selections.length > 1, //TODO
 						}}
 						WrapperProps={{}}
 					/>
@@ -1625,15 +1631,26 @@ const CustomDataGrid = ({
 						columns={
 							mobileMode
 								? columns
-										.filter((column) => !column.hide)
+										.filter(
+											(column) =>
+												!column.hide &&
+												((currentUserIsAdmin && column.adminOnly) ||
+													!column.adminOnly)
+										)
 										.map((column) => ({
 											...omit(column, 'flex'),
 											width: calculateColumnWidth(column.flex),
 											sortable: !sortModel,
 										}))
-								: columns.map((column) =>
-										sortModel ? { ...column, sortable: false } : column
-								  )
+								: columns
+										.filter(
+											(column) =>
+												(currentUserIsAdmin && column.adminOnly) ||
+												!column.adminOnly
+										)
+										.map((column) =>
+											sortModel ? { ...column, sortable: false } : column
+										)
 						}
 						onSelectionModelChange={(model, details) =>
 							DataGridProps?.disableMultipleSelection && model.length > 1

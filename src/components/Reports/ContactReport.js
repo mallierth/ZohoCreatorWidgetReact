@@ -27,12 +27,36 @@ export const columns = [
 		flex: 4,
 	},
 	{
+		field: 'Phone',
+		searchField: ['Direct_Phone', 'Cell_Phone'],
+		flex: 4,
+		valueGetter: ({ row }) => {
+
+			const direct = row.Direct_Phone ? `Direct: ${row.Direct_Phone}` : ''; 
+			const cell = row.Cell_Phone ? `Cell: ${row.Cell_Phone}` : ''; 
+
+			if(direct && cell) {
+				return `${direct} / ${cell}`;
+			}
+
+			if(direct) {
+				return direct;
+			}
+
+			if(cell) {
+				return cell;
+			}
+
+			return "";
+		},
+	},
+	{
 		field: 'Type',
 		flex: 2,
 		valueOptions: ['Account', 'Vendor', 'Subcontractor'],
 	},
 	{
-		field: 'Affilitation',
+		field: 'Affiliation',
 		searchField: ['Accounts_Names'],
 		flex: 4,
 		valueGetter: ({ row }) => {
