@@ -975,7 +975,10 @@ const CustomTable = React.memo(
 					{ ...parentData, Collapsible_Line_Items: payloadArr },
 					(response) => {
 						//If all operations are successful, update table
-						console.log('CustomTable.js onAddAssembly() parentData', parentData);
+						console.log(
+							'CustomTable.js onAddAssembly() parentData',
+							parentData
+						);
 						console.log('CustomTable.js onAddAssembly() response', response);
 						setRows((oldRows) => [
 							...oldRows,
@@ -1029,7 +1032,7 @@ const CustomTable = React.memo(
 				} else {
 					addRecord(formName, data, (response) => {
 						//Add row
-						setRows((oldRows) => [...oldRows, { ...data, ...response, }]);
+						setRows((oldRows) => [...oldRows, { ...data, ...response }]);
 						setWizardOpen(false);
 						wizardLineItemData.current = {}; //Reset Wizard Data
 					});
@@ -1597,7 +1600,10 @@ const CustomTable = React.memo(
 						active: i === successes.length - 1,
 					})
 				);
-				setApplicationTabs((old) => [...old.map(o => ({...o, active: false, })), ..._successes]);
+				setApplicationTabs((old) => [
+					...old.map((o) => ({ ...o, active: false })),
+					..._successes,
+				]);
 			});
 		};
 
@@ -2254,7 +2260,10 @@ const CustomTable = React.memo(
 						loadData: selection,
 						active: i === selections.length - 1,
 					}));
-					setApplicationTabs((old) => [...old.map(o => ({...o, active: false, })), ..._selections]);
+					setApplicationTabs((old) => [
+						...old.map((o) => ({ ...o, active: false })),
+						..._selections,
+					]);
 				},
 			},
 		];
@@ -2493,7 +2502,7 @@ const CustomTable = React.memo(
 							) : null}
 						</AccordionDetails>
 					</Accordion>
-					<Fade
+					{/* <Fade
 						in={formOpen && !lineItemTable}
 						container={formContainerRef.current}>
 						<Box
@@ -2561,15 +2570,35 @@ const CustomTable = React.memo(
 								</Box>
 							</Slide>
 						</Box>
-					</Fade>
+					</Fade> */}
 
 					<Box ref={scrollBottomRef}></Box>
 				</Box>
+
+				<RenderPopup
+					open={formOpen && !lineItemTable}
+					onClose={onFormClose}
+					title={title ? title : <Box></Box>}>
+					<RenderForm
+						id={formId}
+						formName={formName}
+						loadData={onAddFormData}
+						onChange={onFormSave}
+						massUpdating={formOpen && massUpdating}
+						massUpdateRecordIds={selections.map((selection) => selection.ID)}
+						maxHeight={
+							formMaxHeightRef?.current?.clientHeight
+								? formMaxHeightRef?.current?.clientHeight - navBarHeight
+								: formMaxHeightRef?.current?.clientHeight
+						}
+					/>
+				</RenderPopup>
 
 				{lineItemTable ? (
 					<WizardDialog
 						title={wizard.title || 'wizard.title not defined'}
 						hideContentPaperBackground
+						overrideDialogZindex
 						open={wizardOpen}
 						hideNavigation={wizard.hideNavigation}
 						onClose={() => {
@@ -2646,7 +2675,7 @@ const CustomTable = React.memo(
 															: {},
 												}))
 											}
-											overrideDialogZindex
+											//overrideDialogZindex
 										/>
 									</Paper>
 								</Container>

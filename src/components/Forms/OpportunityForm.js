@@ -733,6 +733,7 @@ const OpportunityForm = ({
 											: ''
 									}
 									error={error.Alias}
+									required
 									onChange={(e) => mountData('Alias', e.target.value)}
 								/>
 							</GridInputWrapper>
@@ -819,6 +820,13 @@ const OpportunityForm = ({
 									value={state.currentData.Amount}
 									type='number'
 									onChange={(e) => mountData('Amount', e.target.value)}
+									required
+									helperText={
+										error.Amount
+											? 'Please enter a value for this required field'
+											: ''
+									}
+									error={error.Amount}
 								/>
 							</GridInputWrapper>
 							<GridInputWrapper
@@ -886,6 +894,13 @@ const OpportunityForm = ({
 									label='Closing Date'
 									value={state.currentData.Closing_Date}
 									onChange={(e) => mountData('Closing_Date', e)}
+									required
+									error={error.Closing_Date}
+									helperText={
+										error.Closing_Date
+											? 'Please enter a value for this required field'
+											: ''
+									}
 								/>
 							</GridInputWrapper>
 							<GridInputWrapper

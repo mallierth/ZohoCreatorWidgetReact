@@ -92,6 +92,11 @@ import ContactReport from '../Reports/ContactReport';
 
 //#region //TODO Mass update fields available
 const massUpdateCapableFieldKeys = [];
+
+const defaultLoadData = {
+	Subject_field: '',
+}
+
 //#endregion
 
 //#region //TODO Helper functions
@@ -292,6 +297,7 @@ const EmailForm = ({
 	const debug = useRecoilValue(debugState);
 	const [alerts, setAlerts] = useState({});
 	const [data, setData] = useState({
+		...defaultLoadData,
 		From_Update: currentUser?.Email,
 		...loadData,
 		...resource.read(),
@@ -324,7 +330,7 @@ const EmailForm = ({
 		mountData,
 		resetData,
 		massUpdateRecords,
-	] = useFormData(data, loadData);
+	] = useFormData(data, {...defaultLoadData, ...loadData, } );
 
 	const [massUpdateFieldList, setMassUpdateFieldList] = useState([]);
 	const requiredFields = useRef(columns.filter((column) => column.required));
@@ -433,7 +439,7 @@ const EmailForm = ({
 				});
 			} else {
 				if (id) {
-					updateRecord(plurifyFormName(formName), id, state.data);
+					updateRecord(plurifyFormName(formName), id, state.currentData);
 				} else if (massUpdating) {
 					massUpdateRecords(
 						plurifyFormName(formName),
@@ -445,14 +451,14 @@ const EmailForm = ({
 					);
 				} else {
 					let attachmentCount = 0;
-					state?.data?.File_Upload_0 ? attachmentCount++ : null;
-					state?.data?.File_Upload_1 ? attachmentCount++ : null;
-					state?.data?.File_Upload_2 ? attachmentCount++ : null;
-					state?.data?.File_Upload_3 ? attachmentCount++ : null;
-					state?.data?.File_Upload_4 ? attachmentCount++ : null;
+					state?.currentData?.File_Upload_0 ? attachmentCount++ : null;
+					state?.currentData?.File_Upload_1 ? attachmentCount++ : null;
+					state?.currentData?.File_Upload_2 ? attachmentCount++ : null;
+					state?.currentData?.File_Upload_3 ? attachmentCount++ : null;
+					state?.currentData?.File_Upload_4 ? attachmentCount++ : null;
 					addRecord(
 						formName,
-						{ ...state.data, Attachment_Count: attachmentCount },
+						{ ...state.currentData, Attachment_Count: attachmentCount },
 						(response) => setId(response.ID)
 					);
 				}

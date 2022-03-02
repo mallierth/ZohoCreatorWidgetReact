@@ -15,6 +15,7 @@ import {
 	Block,
 	DeleteForever,
 	Edit,
+	Merge,
 	ReportProblem,
 } from '@mui/icons-material';
 import { useZohoGetAllRecords } from '../Helpers/CustomHooks';
@@ -62,6 +63,7 @@ const TimeLineContent = ({ id }) => {
 								case 'Create':
 									return 'success';
 								case 'Update':
+								case 'Merge':
 									return 'info';
 								case 'Delete':
 									return 'error';
@@ -92,6 +94,7 @@ const TimeLineContent = ({ id }) => {
 														<AddCircleOutline />
 													) : null}
 													{change.Action_Type === 'Update' ? <Edit /> : null}
+													{change.Action_Type === 'Merge' ? <Merge /> : null}
 													{change.Action_Type === 'Delete' ? (
 														<DeleteForever />
 													) : null}
@@ -106,6 +109,7 @@ const TimeLineContent = ({ id }) => {
 												<AddCircleOutline />
 											) : null}
 											{change.Action_Type === 'Update' ? <Edit /> : null}
+											{change.Action_Type === 'Merge' ? <Merge /> : null}
 											{change.Action_Type === 'Delete' ? (
 												<DeleteForever />
 											) : null}

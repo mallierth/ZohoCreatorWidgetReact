@@ -147,34 +147,17 @@ const PortalUser = ({
 		resetData,
 		massUpdateRecords,
 	] = useFormData(data, { ...defaultLoadData, ...loadData });
-	const [conversionState, convertQuoteToSalesOrder] = useFormData();
-	const [lineItemDataState, lineItemDispatch] = useCustomTableLineItemFormData(
-		formName,
-		data
-	);
 
 	const [massUpdateFieldList, setMassUpdateFieldList] = useState([]);
 	const [error, setError] = useState({});
 	const [toastData, setToastData] = useState({});
-	const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
-	const [confirmationDialogData, setConfirmationDialogData] = useState({});
 	const [timelineOpen, setTimelineOpen] = useState(false);
 	const [tabValue, setTabValue] = useState('Notes');
-	const [emailWizardOpen, setEmailWizardOpen] = useState(false);
-	const [printWizardOpen, setPrintWizardOpen] = useState(false);
-	const [convertDialogOpen, setConvertDialogOpen] = useState(false);
-	const [voidDialogOpen, setVoidDialogOpen] = useState(false);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const hasError = Object.keys(error).length > 0;
 	const isVoided =
 		state?.currentData?.Void_field === true ||
 		state?.currentData?.Void_field === 'true';
-
-	const [overrideHtmlCustomerNotes, setOverrideHtmlCustomerNotes] = useState(
-		data.Customer_Notes
-	);
-	const [overrideHtmlTermsConditions, setOverrideHtmlTermsConditions] =
-		useState(data.Terms_Conditions);
 
 	//! Record title when accessed via direct URL
 	useEffect(() => {

@@ -1,0 +1,31 @@
+<Sidenav>
+
+
+	<Box sx={{ flexGrow: 1, }}>
+		//Render form/report/wizard
+	</Box>
+</Sidenav>
+
+// Form
+<Box sx={{ display: 'flex', flexDirection: 'column', backgroundColor: 'background.default', }}> 
+
+	// AppBar
+	// Overview || Changelog
+
+	<FormWrapper>
+		<FormToolbar /> // relative positioned AppBar	
+	
+	</FormWrapper>
+
+	<Container
+    disableGutters
+    maxWidth="xl"
+    sx={{ p: 1, maxWidth: { xs: massUpdating ? Math.ceil(formMaxWidth / 2) : formMaxWidth, }, position: "relative", backgroundColor: "background.default", }}>
+      {children} //Contents of Form are rendered here
+  </Container>
+</Box>
+
+// Report
+<Box sx={{ height, position: 'relative'}}>
+
+</Box>

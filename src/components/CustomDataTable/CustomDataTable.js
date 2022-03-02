@@ -157,6 +157,7 @@ export const ToolbarTitle = ({ mode, formName, recordName }) => {
 	const renderTitle = () => {
 		switch (mode) {
 			case 'massUpdating':
+			case 'merging':
 				return (
 					<Box sx={{ display: 'flex' }}>
 						<DatabaseDefaultIcon form={formName} sx={{ mr: 0.75 }} />
@@ -209,7 +210,7 @@ export const ToolbarTitle = ({ mode, formName, recordName }) => {
 ToolbarTitle.propTypes = {
 	formName: PropTypes.string.isRequired,
 	recordName: PropTypes.string,
-	mode: PropTypes.oneOf(['adding', 'editing', 'massUpdating']),
+	mode: PropTypes.oneOf(['adding', 'editing', 'massUpdating', 'merging']),
 };
 
 const ViewMenuItem = ({
@@ -1104,25 +1105,62 @@ const CustomDataGrid = ({
 	const onClickMerge = () => {
 		const _selections = Array.from(selections);
 		const loadData = {};
+		const dataTypes = {}; //
+		_selections.forEach(selection => {
+			Object.keys(selection).forEach((field) => {
+				if(selection[field] !== undefined && (dataTypes[field] === undefined || dataTypes[field] === 'string')) {
+					//There is data at the current selection
+					if(Array.isArray(selection[field])) {
+						dataTypes[field] = 'array';
+					} else if(typeof selection[field] === 'object') {
+						dataTypes[field] = 'object';
+					} else if(selection[field] === 'true' || selection[field] === true || selection[field] === 'false' || selection[field] === false) {
+						dataTypes[field] = 'bool';
+					} else {
+						dataTypes[field] = 'string';
+					}
+				} else if(!dataTypes[field]) {
+					dataTypes[field] = 'string';
+				}
+			});
+		});
 
-		Object.keys(_selections[0]).forEach((field) => {
-			loadData[field] = [];
+		//console.log('merge dataTypes', dataTypes);
+
+		Object.keys(dataTypes).forEach((field) => {
 			_selections.forEach((selection) => {
 				if (selection[field]) {
-					if (
-						typeof selection[field] !== 'object' &&
-						!loadData[field].includes(selection[field])
-					) {
-						//For simple data types, do an includes check to not add duplicates
-						loadData[field].push(selection[field]);
-					} else if (typeof selection[field] === 'object') {
-						loadData[field].push(selection[field]);
+					switch(dataTypes[field]) {
+						case 'array':
+							if(loadData[field] === undefined) {
+								loadData[field] = selection[field];
+							} else {
+								loadData[field] = [...loadData[field], ...selection[field]];
+							}
+							break;
+						case 'object': //! The latest object is saved... this could potentially be improved with a user interaction
+							if(selection[field]) {
+								loadData[field] = selection[field];
+							} else if(loadData[field] === undefined){
+								loadData[field] = {};
+							}
+							break;
+						default:
+							if(selection[field]) {
+								loadData[field] = selection[field];
+							} else if(loadData[field] === undefined){
+								loadData[field] = '';
+							}
+							break;
 					}
 				}
 			});
 		});
 
-		setRowMergeData(loadData);
+		console.log('onClickMerge', loadData);
+
+		setRowMergeData({ mode: 'merging', loadData: omit(loadData, ['id', 'ID', ]), mergeRecordIds: selections.map(selection => selection.ID ) });
+		setRowMergeDialogOpen(true);
 	};
 
 	const onMerge = () => {};
@@ -1921,6 +1959,41 @@ const CustomDataGrid = ({
 						onDuplicate
 				  )
 				: null}
+
+			{/* Row Merge Dialog */}
+			<RenderPopup
+				open={rowMergeDialogOpen}
+				onClose={() => setRowMergeDialogOpen(false)}
+				title={
+					<ToolbarTitle
+						mode={rowMergeData?.mode}
+						formName={formName}
+						recordName={
+							rowMergeData?.ID ? getNameFn(formName, rowMergeData) : ''
+						}
+					/>
+				}>
+				<RenderForm
+					formName={formName}
+					{...omit(rowMergeData, ['ID', ])}
+					merging
+					onChange={(data) => (formData.current = data)}
+					onMerge={(data) => {
+// setRows((oldRows) =>
+						// 	oldRows.map((row) =>
+						// 		selectionModel.includes(row.ID) ? { ...row, ...data } : row
+						// 	)
+						// )
+						console.log('CustomDataTable.js onMerge data', data);
+						//Back end deletes all records outside of the ID in data
+						//Filter out selected rows whose IDs are not data.ID
+						setRows(oldRows => oldRows.filter(oldRow => !selectionModel.includes(oldRow.id) && oldRow.id !== data.ID))
+					}}
+					maxHeight={
+						window.innerHeight - theme.mixins.toolbar.minHeight * 3 - 16
+					}
+				/>
+			</RenderPopup>
 
 			{/* Delete Rows Toast */}
 			<SaveManager formDataState={rowsFormSaveState} />

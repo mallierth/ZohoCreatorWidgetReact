@@ -50,6 +50,7 @@ const WizardDialog = ({
 	hideNavigation,
 	onClickFinish,
 	hideContentPaperBackground,
+	overrideDialogZindex,
 }) => {
 	//const formMaxWidth = useRecoilValue(formMaxWidthState);
 	const theme = useTheme();
@@ -71,7 +72,10 @@ const WizardDialog = ({
 							left: sidenavOpen ? '248px' : '8px', //
 							bottom: '8px',
 							right: '8px',
-							zIndex: (theme) => theme.zIndex.drawer - 1,
+							zIndex: (theme) =>
+								overrideDialogZindex
+									? theme.zIndex.modal
+									: theme.zIndex.drawer - 1,
 							backgroundColor: (theme) =>
 								theme.palette.mode === 'dark'
 									? 'rgba(255,255,255,0.25)'
@@ -86,8 +90,15 @@ const WizardDialog = ({
 							} - ${widthAdjustment}px)`,
 							height: (theme) =>
 								`calc(100vh - ${theme.mixins.toolbar.minHeight * 2}px - 16px)`,
+							zIndex: (theme) =>
+								overrideDialogZindex
+									? theme.zIndex.modal + 1
+									: theme.zIndex.drawer,
 						},
-						zIndex: (theme) => theme.zIndex.drawer,
+						zIndex: (theme) =>
+							overrideDialogZindex
+								? theme.zIndex.modal
+								: theme.zIndex.drawer - 1,
 					}}
 					anchor={'right'}
 					open={open}
@@ -227,7 +238,7 @@ WizardDialog.propTypes = {
 	onClose: PropTypes.func.isRequired,
 	maxWidth: PropTypes.string,
 	children: PropTypes.oneOfType([PropTypes.array]),
-
+	overrideDialogZindex: PropTypes.bool,
 	//Stepper portion
 	steps: PropTypes.array.isRequired,
 	activeStep: PropTypes.number.isRequired,

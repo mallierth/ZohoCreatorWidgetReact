@@ -56,7 +56,7 @@ import GridFormSectionWrapper from '../FormControls/GridFormSectionWrapper';
 import GridInputWrapper from '../FormControls/GridInputWrapper';
 import TabbedSectionContent from '../TabbedSection/TabbedSectionContent';
 import StatusGraphic from '../FormControls/StatusGraphic';
-import { useFormData, useDebouncedEffect } from '../Helpers/CustomHooks';
+import { formatFormData, useFormData, useDebouncedEffect } from '../Helpers/CustomHooks';
 import CustomTable from '../CustomTable/CustomTable';
 import FormWrapper from '../FormControls/FormWrapper';
 import ToastMessage from '../ToastMessage/ToastMessage';
@@ -263,6 +263,10 @@ const ContactForm = ({
 	massUpdateRecordIds,
 	uuid,
 	maxHeight,
+
+	merging,
+	mergeRecordIds,
+	onMerge,
 }) => {
 	const currentUser = useRecoilValue(currentUserState);
 	const columns = useRecoilValue(
@@ -403,6 +407,14 @@ const ContactForm = ({
 							console.log('massUpdate response', response);
 						}
 					);
+				} else if(merging) {
+
+					const mergeData = { Form: formName, Data: state.currentData, Record_IDs: mergeRecordIds, Merge_Into_Record_ID: mergeRecordIds[0]};
+					const formattedData = formatFormData(mergeData);
+					addRecord('Merge_Request', JSON.stringify(formattedData.data), (response) => {
+						console.log('merge response', response);
+						onMerge({...state.currentData, ID: mergeRecordIds[0]});
+					});
 				} else {
 					addRecord(formName, state.data, (response) => setId(response.ID));
 				}
@@ -870,12 +882,18 @@ ContactForm.propTypes = {
 	massUpdateRecordIds: PropTypes.array,
 	uuid: PropTypes.string,
 	maxHeight: PropTypes.number,
+	merging: PropTypes.bool,
+	onMerge: PropTypes.func,
+	mergeRecordIds: PropTypes.array,
 };
 
 ContactForm.defaultProps = {
 	loadData: {},
 	massUpdating: false,
 	massUpdateRecordIds: [],
+	merging: false,
+	onMerge: () => {},
+	mergeRecordIds: [],
 };
 
 const Wrapper = (props) => {

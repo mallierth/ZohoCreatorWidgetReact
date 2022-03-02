@@ -120,14 +120,16 @@ const RenderPopup = ({
 							top: '110px',
 							right: '8px',
 							maxWidth: maxWidth ? maxWidth : formMaxWidth,
-							width: `calc(100vw - ${sidenavOpen ? '256px' : '0px'} - ${widthAdjustment}px)`,
+							width: `calc(100vw - ${
+								sidenavOpen ? '256px' : '0px'
+							} - ${widthAdjustment}px)`,
 							height: (theme) =>
 								`calc(100vh - ${theme.mixins.toolbar.minHeight * 2}px - 16px)`,
+							zIndex: (theme) =>
+								overrideDialogZindex
+									? theme.zIndex.modal + 1
+									: theme.zIndex.drawer,
 						},
-						zIndex: (theme) =>
-							overrideDialogZindex
-								? theme.zIndex.modal + 1
-								: theme.zIndex.drawer,
 					}}
 					anchor={'right'}
 					open={open}
