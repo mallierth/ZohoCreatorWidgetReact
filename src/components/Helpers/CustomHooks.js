@@ -15,6 +15,7 @@ import { appName } from '../../apis/ZohoCreator';
 export const useFormData = (data = {}, loadData) => {
 	const initialState = {
 		status: '',
+		title: '',
 		message: '',
 		error: '',
 		data: data.ID || !loadData ? {} : loadData,
@@ -67,6 +68,7 @@ export const useFormData = (data = {}, loadData) => {
 				return {
 					...state,
 					status: '',
+					title: '',
 					message: '',
 					error: '',
 					data: {},
@@ -79,6 +81,7 @@ export const useFormData = (data = {}, loadData) => {
 				return {
 					...state,
 					status: 'saving',
+					title: action.title,
 					message: action.message,
 					data: action.payload,
 					currentData: { ...state.savedData, ...action.payload },
@@ -89,6 +92,7 @@ export const useFormData = (data = {}, loadData) => {
 				return {
 					...state,
 					status: 'saved',
+					title: action.title,
 					message: action.message,
 					data: {},
 					savedData: { ...state.savedData, ...action.payload },
@@ -100,6 +104,7 @@ export const useFormData = (data = {}, loadData) => {
 				return {
 					...state,
 					status: 'error',
+					title: action.title,
 					message: action.message,
 					error: action.payload,
 					onSuccess: null,
@@ -108,6 +113,7 @@ export const useFormData = (data = {}, loadData) => {
 				return {
 					...state,
 					status: 'workflow_error',
+					title: action.title,
 					message: action.message,
 					error: action.payload,
 					onSuccess: null,
@@ -116,6 +122,7 @@ export const useFormData = (data = {}, loadData) => {
 				return {
 					...state,
 					status: 'validation_error',
+					title: action.title,
 					message: action.message,
 					error: action.payload,
 					onSuccess: null,
@@ -124,6 +131,7 @@ export const useFormData = (data = {}, loadData) => {
 				return {
 					...state,
 					status: 'saved_with_errors',
+					title: action.title,
 					message: action.message,
 					data: action.payload,
 					onSuccess: action.onSuccess,
@@ -133,6 +141,7 @@ export const useFormData = (data = {}, loadData) => {
 					...state,
 					status: 'deleting',
 					message: action.message,
+					title: action.title,
 					data: action.payload,
 					savedData: null,
 					error: null,
@@ -142,6 +151,7 @@ export const useFormData = (data = {}, loadData) => {
 				return {
 					...state,
 					status: 'deleted',
+					title: action.title,
 					message: action.message,
 					data: {},
 					savedData: { ...state.data, ...action.payload },
@@ -152,6 +162,7 @@ export const useFormData = (data = {}, loadData) => {
 				return {
 					...state,
 					status: 'uploaded_with_errors',
+					title: action.title,
 					message: action.message,
 					data: action.payload,
 					onSuccess: action.onSuccess,
@@ -160,6 +171,7 @@ export const useFormData = (data = {}, loadData) => {
 				return {
 					...state,
 					status: 'uploading',
+					title: action.title,
 					message: action.message,
 					data: action.payload,
 					error: null,
@@ -169,6 +181,7 @@ export const useFormData = (data = {}, loadData) => {
 				return {
 					...state,
 					status: 'uploaded',
+					title: action.title,
 					message: action.message,
 					data: {},
 					savedData: { ...state.savedData, ...action.payload },
@@ -387,17 +400,66 @@ export const useFormData = (data = {}, loadData) => {
 					});
 				} else if (response && response.code === 3001) {
 					//! Back end workflow error
+					let workflowTitle = '';
+					let verdict = '';
+					let errorMessage = [];
+					if (Array.isArray(response.error)) {
+						response.error.forEach((err) => {
+							switch (err.task) {
+								case 'alert':
+									err.alert_message.forEach((alert) =>
+										errorMessage.push(alert)
+									);
+									break;
+								case 'info':
+									workflowTitle = err.header_message.replaceAll(
+										' : log messages',
+										''
+									);
+									err.info_values.forEach((info) => errorMessage.push(info));
+									break;
+								case 'cancel_submit':
+									//errorMessage.push(`${err.message}`)
+									verdict = err.message.replaceAll('.', '');
+									break;
+							}
+						});
+					}
 					dispatch({
 						type: 'WORKFLOW_ERROR',
 						payload: response.error,
+						title:
+							verdict && workflowTitle
+								? `${verdict} from within the ${workflowTitle} workflow!`
+								: verdict,
+						message:
+							errorMessage.length > 0
+								? errorMessage
+										.map((err) => (!err.endsWith('.') ? err + '.' : err))
+										.join(' ')
+								: '',
 					});
 				} else if (response && response.code === 3002) {
 					//! Back end validation failed
+					//error[fieldKey]
+					let errorMessage = [];
+					Object.keys(response.error).forEach((field) =>
+						errorMessage.push(
+							`Error with "${field.replaceAll('_', ' ')}" field: ${
+								response.error[field]
+							}`
+						)
+					);
 					dispatch({
 						type: 'VALIDATION_ERROR',
-						payload: Object.keys(response.error).map(
-							(key) => response.error[key]
-						),
+						payload: response.error,
+						title: `Zoho Validation Failed`,
+						message:
+							errorMessage.length > 0
+								? errorMessage
+										.map((err) => (!err.endsWith('.') ? err + '.' : err))
+										.join(' ')
+								: '',
 					});
 				} else if (response && response.code === 404) {
 					dispatch({
@@ -601,17 +663,66 @@ export const useFormData = (data = {}, loadData) => {
 					});
 				} else if (response && response.code === 3001) {
 					//! Back end workflow error
+					let workflowTitle = '';
+					let verdict = '';
+					let errorMessage = [];
+					if (Array.isArray(response.error)) {
+						response.error.forEach((err) => {
+							switch (err.task) {
+								case 'alert':
+									err.alert_message.forEach((alert) =>
+										errorMessage.push(alert)
+									);
+									break;
+								case 'info':
+									workflowTitle = err.header_message.replaceAll(
+										' : log messages',
+										''
+									);
+									err.info_values.forEach((info) => errorMessage.push(info));
+									break;
+								case 'cancel_submit':
+									//errorMessage.push(`${err.message}`)
+									verdict = err.message.replaceAll('.', '');
+									break;
+							}
+						});
+					}
 					dispatch({
 						type: 'WORKFLOW_ERROR',
 						payload: response.error,
+						title:
+							verdict && workflowTitle
+								? `${verdict} from within the ${workflowTitle} workflow!`
+								: verdict,
+						message:
+							errorMessage.length > 0
+								? errorMessage
+										.map((err) => (!err.endsWith('.') ? err + '.' : err))
+										.join(' ')
+								: '',
 					});
 				} else if (response && response.code === 3002) {
 					//! Back end validation failed
+					//error[fieldKey]
+					let errorMessage = [];
+					Object.keys(response.error).forEach((field) =>
+						errorMessage.push(
+							`Error with "${field.replaceAll('_', ' ')}" field: ${
+								response.error[field]
+							}`
+						)
+					);
 					dispatch({
 						type: 'VALIDATION_ERROR',
-						payload: Object.keys(response.error).map(
-							(key) => response.error[key]
-						),
+						payload: response.error,
+						title: `Zoho Validation Failed`,
+						message:
+							errorMessage.length > 0
+								? errorMessage
+										.map((err) => (!err.endsWith('.') ? err + '.' : err))
+										.join(' ')
+								: '',
 					});
 				} else {
 					console.log('unaccounted for on add error code:', response);
@@ -708,17 +819,64 @@ export const useFormData = (data = {}, loadData) => {
 				});
 			} else if (response && response.code === 3001) {
 				//! Back end workflow error
+				let workflowTitle = '';
+				let verdict = '';
+				let errorMessage = [];
+				if (Array.isArray(response.error)) {
+					response.error.forEach((err) => {
+						switch (err.task) {
+							case 'alert':
+								err.alert_message.forEach((alert) => errorMessage.push(alert));
+								break;
+							case 'info':
+								workflowTitle = err.header_message.replaceAll(
+									' : log messages',
+									''
+								);
+								err.info_values.forEach((info) => errorMessage.push(info));
+								break;
+							case 'cancel_submit':
+								//errorMessage.push(`${err.message}`)
+								verdict = err.message.replaceAll('.', '');
+								break;
+						}
+					});
+				}
 				dispatch({
 					type: 'WORKFLOW_ERROR',
 					payload: response.error,
+					title:
+						verdict && workflowTitle
+							? `${verdict} from within the ${workflowTitle} workflow!`
+							: verdict,
+					message:
+						errorMessage.length > 0
+							? errorMessage
+									.map((err) => (!err.endsWith('.') ? err + '.' : err))
+									.join(' ')
+							: '',
 				});
 			} else if (response && response.code === 3002) {
 				//! Back end validation failed
+				//error[fieldKey]
+				let errorMessage = [];
+				Object.keys(response.error).forEach((field) =>
+					errorMessage.push(
+						`Error with "${field.replaceAll('_', ' ')}" field: ${
+							response.error[field]
+						}`
+					)
+				);
 				dispatch({
 					type: 'VALIDATION_ERROR',
-					payload: Object.keys(response.error).map(
-						(key) => response.error[key]
-					),
+					payload: response.error,
+					title: `Zoho Validation Failed`,
+					message:
+						errorMessage.length > 0
+							? errorMessage
+									.map((err) => (!err.endsWith('.') ? err + '.' : err))
+									.join(' ')
+							: '',
 				});
 			} else {
 				console.log('unaccounted for uploadFile error code:', response);

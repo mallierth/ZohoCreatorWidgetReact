@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Snackbar } from '@mui/material';
+import { Alert, AlertTitle, Snackbar } from '@mui/material';
 
 const ToastMessage = ({
 	data,
@@ -39,6 +39,7 @@ const ToastMessage = ({
 							width: '100%',
 							backgroundColor: data.color ? data.color : null,
 						}}>
+						{data.title ? <AlertTitle>{data.title}</AlertTitle> : null}
 						{data.message}
 					</Alert>
 				</Snackbar>
@@ -57,6 +58,7 @@ const ToastMessage = ({
 								width: '100%',
 								backgroundColor: data.color ? data.color : null,
 							}}>
+							{data.title ? <AlertTitle>{data.title}</AlertTitle> : null}
 							{data.message}
 						</Alert>
 					</Snackbar>
@@ -68,6 +70,7 @@ const ToastMessage = ({
 
 ToastMessage.propTypes = {
 	data: PropTypes.shape({
+		title: PropTypes.string,
 		message: PropTypes.string,
 		severity: PropTypes.oneOf(['error', 'info', 'success', 'warning']),
 		color: PropTypes.string,

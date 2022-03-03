@@ -13,6 +13,7 @@ const SaveManager = ({ formDataState, email, defaultLocation }) => {
 			case 'uploading':
 				setAutoHideDuration(null);
 				setToastData({
+					title: formDataState.title,
 					message: formDataState.message ? formDataState.message : 'Uploading files to database...',
 					severity: 'info',
 					color: 'secondary.light',
@@ -21,6 +22,7 @@ const SaveManager = ({ formDataState, email, defaultLocation }) => {
 			case 'uploaded':
 				setAutoHideDuration(defaultAutoHideDuration);
 				setToastData({
+					title: formDataState.title,
 					message: formDataState.message ? formDataState.message : 'Files uploaded successfully!',
 					severity: 'success',
 					color: 'primary.light',
@@ -29,6 +31,7 @@ const SaveManager = ({ formDataState, email, defaultLocation }) => {
 			case 'saving':
 				setAutoHideDuration(null);
 				setToastData({
+					title: formDataState.title,
 					message: formDataState.message ? formDataState.message : email ? 'Working on sending email...' : 'Saving data to database...',
 					severity: 'info',
 				});
@@ -36,6 +39,7 @@ const SaveManager = ({ formDataState, email, defaultLocation }) => {
 			case 'saved':
 				setAutoHideDuration(defaultAutoHideDuration);
 				setToastData({
+					title: formDataState.title,
 					message: formDataState.message ? formDataState.message : email ? 'Email sent successfully!' : 'Data saved successfully!',
 					severity: 'success',
 				});
@@ -43,6 +47,7 @@ const SaveManager = ({ formDataState, email, defaultLocation }) => {
 			case 'deleting':
 				setAutoHideDuration(null);
 				setToastData({
+					title: formDataState.title,
 					message: formDataState.message ? formDataState.message : 'Deleting data in database...',
 					severity: 'info',
 				});
@@ -50,6 +55,7 @@ const SaveManager = ({ formDataState, email, defaultLocation }) => {
 			case 'deleted':
 				setAutoHideDuration(defaultAutoHideDuration);
 				setToastData({
+					title: formDataState.title,
 					message: formDataState.message ? formDataState.message : 'Data deleted successfully!',
 					severity: 'success',
 				});
@@ -57,6 +63,7 @@ const SaveManager = ({ formDataState, email, defaultLocation }) => {
 			case 'workflow_error':
 				setAutoHideDuration(defaultAutoHideDuration);
 				setToastData({
+					title: formDataState.title,
 					message: formDataState.message ? formDataState.message : `Data save forcibly interrupted by a Zoho workflow, please contact your system's administrator!`,
 					severity: 'warning',
 				});
@@ -64,6 +71,7 @@ const SaveManager = ({ formDataState, email, defaultLocation }) => {
 			case 'validation_error':
 				setAutoHideDuration(defaultAutoHideDuration);
 				setToastData({
+					title: formDataState.title,
 					message: formDataState.message ? formDataState.message : 'Error saving data: form data validation failed!',
 					severity: 'error',
 				});
@@ -71,6 +79,7 @@ const SaveManager = ({ formDataState, email, defaultLocation }) => {
 			case 'saved_with_errors':
 				setAutoHideDuration(defaultAutoHideDuration);
 				setToastData({
+					title: formDataState.title,
 					message: formDataState.message ? formDataState.message : 'Data saved but with errors... hmm...',
 					severity: 'warning',
 				});
@@ -78,6 +87,7 @@ const SaveManager = ({ formDataState, email, defaultLocation }) => {
 			case 'error':
 				setAutoHideDuration(defaultAutoHideDuration);
 				setToastData({
+					title: formDataState.title,
 					message: formDataState.message ? formDataState.message : `Error saving data: ${formDataState.error}`,
 					severity: 'error',
 				});
@@ -96,6 +106,7 @@ SaveManager.propTypes = {
             PropTypes.object,
             PropTypes.array,
         ]),
+		title: PropTypes.string,
 		message: PropTypes.string,
     }),
 	email: PropTypes.bool,
