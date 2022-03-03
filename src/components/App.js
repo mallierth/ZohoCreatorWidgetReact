@@ -78,6 +78,7 @@ import SubscriptionReport from './Reports/SubscriptionReport';
 import TaskReport from './Reports/TaskReport';
 import TimeEntryReport from './Reports/TimeEntryReport';
 import VendorReport from './Reports/VendorReport';
+import LockUi from './Loaders/LockUi';
 
 //#endregion
 
@@ -721,7 +722,7 @@ const App = () => {
 		<StyledEngineProvider injectFirst>
 			<ThemeProvider theme={createTheme(theme)}>
 				<CssBaseline />
-
+				<LockUi />
 				{!widgetStatus.loading ? (
 					sideNavEnabled ? (
 						<SideNav renderPage={renderPage} />

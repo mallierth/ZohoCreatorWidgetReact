@@ -1,11 +1,11 @@
 //import { useWhyDidYouUpdate } from 'use-why-did-you-update';
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useRecoilValue } from 'recoil';
+import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { omit } from 'lodash';
 import ThemeCard from '../ThemeCard';
 import TabbedSection from '../TabbedSection/TabbedSection';
-import { debugState, currentUserState } from '../../recoil/atoms';
+import { debugState, currentUserState, lockUiState } from '../../recoil/atoms';
 import * as Columns from '../../recoil/columnAtoms';
 import DatabaseDefaultIcon from '../Helpers/DatabaseDefaultIcon';
 import LookupField2 from '../FormControls/LookupField2';
@@ -269,6 +269,7 @@ const ContactForm = ({
 	onMerge,
 }) => {
 	const currentUser = useRecoilValue(currentUserState);
+	const setLockUi = useSetRecoilState(lockUiState);
 	const columns = useRecoilValue(
 		Columns[`${camelize(formName.replaceAll('_', ''))}ColumnsState`]
 	);
@@ -408,12 +409,15 @@ const ContactForm = ({
 						}
 					);
 				} else if(merging) {
-
-					const mergeData = { Form: formName, Data: state.currentData, Record_IDs: mergeRecordIds, Merge_Into_Record_ID: mergeRecordIds[0]};
-					const formattedData = formatFormData(mergeData);
-					addRecord('Merge_Request', JSON.stringify(formattedData.data), (response) => {
-						console.log('merge response', response);
-						onMerge({...state.currentData, ID: mergeRecordIds[0]});
+					setLockUi(state => ({...state, open: true}));
+					const mergeData = { Form: formName, Data: JSON.stringify(formatFormData(state.currentData).data), Record_IDs: JSON.stringify(mergeRecordIds), Merge_Into_Record_ID: mergeRecordIds[0]};
+					addRecord('Merge_Request', mergeData, (response) => {
+						setLockUi(state => ({...state, open: false}));
+						if(JSON.parse(response.Response).code === 3000) {
+							onMerge({...JSON.parse(response.Data), ID: mergeRecordIds[0]});
+						} else {
+							console.error(response.Response);
+						}
 					});
 				} else {
 					addRecord(formName, state.data, (response) => setId(response.ID));
@@ -739,7 +743,7 @@ const ContactForm = ({
 							<GridInputWrapper
 								massUpdating={massUpdating}
 								hidden={
-									massUpdating && !massUpdateFieldList.includes('Description')
+									massUpdating && !massUpdateFieldList.includes('Notes')
 								}>
 								<TextField
 									label='Description'

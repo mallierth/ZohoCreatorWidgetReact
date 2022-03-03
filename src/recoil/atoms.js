@@ -6,6 +6,13 @@ export const debugState = atom({
 	default: false,
 });
 
+export const lockUiState = atom({
+	key: 'lockUiState',
+	default: {
+		open: false,
+	},
+});
+
 export const sidenavOpenState = atom({
 	key: 'sidenavOpenState',
 	default: true,

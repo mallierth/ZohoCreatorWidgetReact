@@ -1106,20 +1106,28 @@ const CustomDataGrid = ({
 		const _selections = Array.from(selections);
 		const loadData = {};
 		const dataTypes = {}; //
-		_selections.forEach(selection => {
+		_selections.forEach((selection) => {
 			Object.keys(selection).forEach((field) => {
-				if(selection[field] !== undefined && (dataTypes[field] === undefined || dataTypes[field] === 'string')) {
+				if (
+					selection[field] !== undefined &&
+					(dataTypes[field] === undefined || dataTypes[field] === 'string')
+				) {
 					//There is data at the current selection
-					if(Array.isArray(selection[field])) {
+					if (Array.isArray(selection[field])) {
 						dataTypes[field] = 'array';
-					} else if(typeof selection[field] === 'object') {
+					} else if (typeof selection[field] === 'object') {
 						dataTypes[field] = 'object';
-					} else if(selection[field] === 'true' || selection[field] === true || selection[field] === 'false' || selection[field] === false) {
+					} else if (
+						selection[field] === 'true' ||
+						selection[field] === true ||
+						selection[field] === 'false' ||
+						selection[field] === false
+					) {
 						dataTypes[field] = 'bool';
 					} else {
 						dataTypes[field] = 'string';
 					}
-				} else if(!dataTypes[field]) {
+				} else if (!dataTypes[field]) {
 					dataTypes[field] = 'string';
 				}
 			});
@@ -1130,25 +1138,34 @@ const CustomDataGrid = ({
 		Object.keys(dataTypes).forEach((field) => {
 			_selections.forEach((selection) => {
 				if (selection[field]) {
-					switch(dataTypes[field]) {
+					switch (dataTypes[field]) {
 						case 'array':
-							if(loadData[field] === undefined) {
+							if (loadData[field] === undefined) {
 								loadData[field] = selection[field];
 							} else {
 								loadData[field] = [...loadData[field], ...selection[field]];
+
+								let _uniqueArray = [];
+								loadData[field].forEach((existing) => {
+									var i = _uniqueArray.findIndex((x) => x.ID == existing.ID);
+									if (i <= -1) {
+										_uniqueArray.push(existing);
+									}
+								});
+								loadData[field] = _uniqueArray;
 							}
 							break;
 						case 'object': //! The latest object is saved... this could potentially be improved with a user interaction
-							if(selection[field]) {
+							if (selection[field]) {
 								loadData[field] = selection[field];
-							} else if(loadData[field] === undefined){
+							} else if (loadData[field] === undefined) {
 								loadData[field] = {};
 							}
 							break;
 						default:
-							if(selection[field]) {
+							if (selection[field]) {
 								loadData[field] = selection[field];
-							} else if(loadData[field] === undefined){
+							} else if (loadData[field] === undefined) {
 								loadData[field] = '';
 							}
 							break;
@@ -1159,7 +1176,11 @@ const CustomDataGrid = ({
 
 		console.log('onClickMerge', loadData);
 
-		setRowMergeData({ mode: 'merging', loadData: omit(loadData, ['id', 'ID', ]), mergeRecordIds: selections.map(selection => selection.ID ) });
+		setRowMergeData({
+			mode: 'merging',
+			loadData: omit(loadData, ['id', 'ID']),
+			mergeRecordIds: selections.map((selection) => selection.ID),
+		});
 		setRowMergeDialogOpen(true);
 	};
 
@@ -1975,19 +1996,20 @@ const CustomDataGrid = ({
 				}>
 				<RenderForm
 					formName={formName}
-					{...omit(rowMergeData, ['ID', ])}
+					{...omit(rowMergeData, ['ID'])}
 					merging
 					onChange={(data) => (formData.current = data)}
 					onMerge={(data) => {
-// setRows((oldRows) =>
-						// 	oldRows.map((row) =>
-						// 		selectionModel.includes(row.ID) ? { ...row, ...data } : row
-						// 	)
-						// )
-						console.log('CustomDataTable.js onMerge data', data);
-						//Back end deletes all records outside of the ID in data
-						//Filter out selected rows whose IDs are not data.ID
-						setRows(oldRows => oldRows.filter(oldRow => !selectionModel.includes(oldRow.id) && oldRow.id !== data.ID))
+						setRowMergeDialogOpen(false);
+						setRows((oldRows) =>
+							oldRows
+								.filter(
+									(oldRow) =>
+										!selectionModel.includes(oldRow.id) && oldRow.id !== data.ID
+								)
+								.map((x) => (x.ID === data.ID ? { ...x, data } : x))
+						);
+						setSelectionModel([]);
 					}}
 					maxHeight={
 						window.innerHeight - theme.mixins.toolbar.minHeight * 3 - 16
