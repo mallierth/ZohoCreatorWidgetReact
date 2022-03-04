@@ -206,7 +206,7 @@ const TaskReport = ({
 						Task: data.ID,
 						Subject_field: '',
 						Cc: '',
-						To: data.Employees,
+						To: data.Employees && data.Employees.length > 0 ? data.Employees.map(x => x.ID) : '',
 						Message: '',
 						From_Update: 'Support',
 						Default_Template_Name: 'Onsite Appointment for Tech',

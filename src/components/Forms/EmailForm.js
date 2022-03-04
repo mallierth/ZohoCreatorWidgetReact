@@ -348,7 +348,7 @@ const EmailForm = ({
 	const [contactsCcModalOpen, setContactsCcModalOpen] = useState(false);
 	const [toDropdownOpen, setToDropdownOpen] = useState(false);
 	const [selectedContacts, setSelectedContacts] = useState(loadData.To || []);
-	const [customInputContacts, setCustomInputContacts] = useState(data.To && Array.isArray(data.To) ? data.To : []);
+	const [customInputContacts, setCustomInputContacts] = useState([]); //data.To && Array.isArray(data.To) ? data.To : 
 	const [selectedCcContacts, setSelectedCcContacts] = useState([]);
 	const [customInputCcContacts, setCustomInputCcContacts] = useState([]);
 	const [templateFetching, setTemplateFetching] = useState(false);
@@ -385,6 +385,7 @@ const EmailForm = ({
 
 	//! Used to auto load selec
 	useEffect(() => {
+		console.log('employeeEmailState', employeeEmailState);
 		if (employeeEmailState?.data?.length > 0) {
 			setSelectedContacts(employeeEmailState.data);
 		} else if (contactEmailState?.data?.length > 0) {
@@ -1183,7 +1184,7 @@ EmailForm.propTypes = {
 		Parent_ID: PropTypes.string,
 		Subject_field: PropTypes.string,
 		Cc: PropTypes.string,
-		To: PropTypes.string,
+		To: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
 		Message: PropTypes.string,
 		From_Update: PropTypes.string,
 		Default_Template_Name: PropTypes.string,

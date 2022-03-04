@@ -77,6 +77,12 @@ export const columns = [
 		flex: 2,
 		valueGetter: ({ value }) => value.display_value || '',
 	},
+	{
+		field: 'ID',
+		searchField: false,
+		flex: 2,
+		adminOnly: true,
+	}
 ];
 
 //? Add columns that will be used only for filtering
